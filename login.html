@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Akses Akun - IDX Confluence Terminal</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'JetBrains Mono', monospace; }
+  </style>
+</head>
+<body class="bg-[#080a0f] text-slate-200 min-h-screen flex items-center justify-center p-4 selection:bg-emerald-500 selection:text-black">
+
+  <div class="max-w-sm w-full bg-[#0f141d] border border-slate-800 p-6 sm:p-8 rounded-2xl shadow-2xl space-y-5">
+    
+    <!-- HEADER -->
+    <div class="text-center space-y-2">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-bold">
+        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+        <span>TERMINAL AUTH</span>
+      </div>
+      <h1 class="text-xl font-black tracking-wider text-white">IDX CONFLUENCE</h1>
+      <p id="subHeaderText" class="text-[11px] text-slate-400">Masuk untuk mengakses terminal pasar modal</p>
+    </div>
+
+    <!-- TAB PILIHAN MASUK / DAFTAR -->
+    <div id="tabContainer" class="flex items-center bg-[#141a24] p-1 rounded-lg border border-slate-800 text-xs font-bold">
+      <button id="tabLogin" onclick="switchAuthMode('login')" class="flex-1 py-1.5 rounded-md bg-emerald-600 text-white transition">
+        MASUK
+      </button>
+      <button id="tabRegister" onclick="switchAuthMode('register')" class="flex-1 py-1.5 rounded-md text-slate-400 hover:text-white transition">
+        DAFTAR BARU
+      </button>
+    </div>
+
+    <!-- BOX PESAN NOTIFIKASI -->
+    <div id="alertBox" class="hidden p-3 rounded-lg border text-xs font-medium leading-relaxed"></div>
+
+    <!-- 1. FORM LOGIN -->
+    <form id="formLogin" onsubmit="handleLoginSubmit(event)" class="space-y-4 text-xs">
+      <div>
+        <label class="block text-slate-400 mb-1 font-semibold">EMAIL / USERNAME</label>
+        <input id="loginEmail" type="text" required autocomplete="username"
+               class="w-full bg-[#141a24] border border-slate-700 rounded-lg px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 font-sans" 
+               placeholder="nama@email.com" />
+      </div>
+
+      <div>
+        <label class="block text-slate-400 mb-1 font-semibold">PASSWORD</label>
+        <input id="loginPassword" type="password" required autocomplete="current-password"
+               class="w-full bg-[#141a24] border border-slate-700 rounded-lg px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 font-sans" 
+               placeholder="••••••••" />
+      </div>
+
+      <button id="btnLoginSubmit" type="submit" 
+              class="w-full py-2.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold transition flex items-center justify-center gap-2 shadow-lg shadow-emerald-950">
+        <span id="loginBtnText">MASUK KE TERMINAL</span>
+      </button>
+    </form>
+
+    <!-- 2. FORM REGISTER (DATA TRADER) -->
+    <form id="formRegister" onsubmit="handleRegisterSubmit(event)" class="hidden space-y-3 text-xs">
+      <div>
+        <label class="block text-slate-400 mb-1 font-semibold">NAMA TRADER</label>
+        <input id="regName" type="text" required autocomplete="name"
+               class="w-full bg-[#141a24] border border-slate-700 rounded-lg px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 font-sans" 
+               placeholder="Cth: Salman Trader" />
+      </div>
+
+      <div>
+        <label class="block text-slate-400 mb-1 font-semibold">EMAIL AKTIF (UNTUK TERIMA OTP)</label>
+        <input id="regEmail" type="email" required autocomplete="email"
+               class="w-full bg-[#141a24] border border-slate-700 rounded-lg px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 font-sans" 
+               placeholder="trader@gmail.com" />
+      </div>
+
+      <div>
+        <label class="block text-slate-400 mb-1 font-semibold">PASSWORD</label>
+        <input id="regPassword" type="password" required autocomplete="new-password"
+               class="w-full bg-[#141a24] border border-slate-700 rounded-lg px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 font-sans" 
+               placeholder="Minimal 6 karakter" />
+      </div>
+
+      <div>
+        <label class="block text-slate-400 mb-1 font-semibold">KONFIRMASI PASSWORD</label>
+        <input id="regPasswordConfirm" type="password" required autocomplete="new-password"
+               class="w-full bg-[#141a24] border border-slate-700 rounded-lg px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 font-sans" 
+               placeholder="Ulangi password di atas" />
+      </div>
+
+      <button id="btnRegisterSubmit" type="submit" 
+              class="w-full py-2.5 rounded-lg bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold transition flex items-center justify-center gap-2 shadow-lg shadow-emerald-950 mt-2">
+        <span id="regBtnText">KIRIM KODE OTP EMAIL</span>
+      </button>
+    </form>
+
+    <!-- 3. FORM INPUT OTP VERIFIKASI -->
+    <form id="formOtpVerify" onsubmit="handleOtpSubmit(event)" class="hidden space-y-4 text-xs">
+      <div class="text-center">
+        <p class="text-[11px] text-slate-400">Kode 6 digit telah dikirim ke:</p>
+        <p id="otpTargetEmailText" class="font-bold text-sky-400 mt-0.5 text-xs font-sans">-</p>
+      </div>
+
+      <div>
+        <label class="block text-center text-slate-400 mb-2 font-semibold">MASUKKAN 6 DIGIT KODE OTP</label>
+        <input id="otpCodeInput" type="text" maxlength="6" required autofocus
+               class="w-full bg-[#141a24] border border-sky-500/50 rounded-lg py-2.5 text-center text-2xl font-black text-sky-400 tracking-[8px] focus:outline-none focus:border-sky-400 font-mono" 
+               placeholder="••••••" />
+        <span class="block text-center text-[10px] text-slate-500 mt-1">Berlaku selama 5 menit (cek folder Spam jika perlu)</span>
+      </div>
+
+      <button id="btnOtpSubmit" type="submit" 
+              class="w-full py-2.5 rounded-lg bg-sky-600 hover:bg-sky-500 text-white font-bold transition flex items-center justify-center gap-2 shadow-lg shadow-sky-950">
+        <span id="otpBtnText">VERIFIKASI & MASUK TERMINAL</span>
+      </button>
+
+      <div class="text-center pt-1">
+        <button type="button" onclick="switchAuthMode('register')" class="text-[11px] text-slate-400 hover:text-white underline">
+          ← Kembali / Ubah Email
+        </button>
+      </div>
+    </form>
+
+    <!-- FOOTER NAV -->
+    <div class="pt-2 border-t border-slate-800 text-center flex items-center justify-between text-[11px] text-slate-500">
+      <a href="/docs" target="_blank" class="hover:text-emerald-400 transition"> Pelajari Fitur</a>
+      <span class="text-slate-600">•</span>
+      <span class="text-slate-400">Versi Pro 2026</span>
+    </div>
+
+  </div>
+
+  <script>
+    let currentRegEmail = '';
+
+    function showAlert(msg, isSuccess = false) {
+      const box = document.getElementById('alertBox');
+      box.innerText = msg;
+      box.className = isSuccess 
+        ? 'p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-medium leading-relaxed block'
+        : 'p-3 rounded-lg bg-rose-500/10 border border-rose-500/30 text-rose-400 text-xs font-medium leading-relaxed block';
+    }
+
+    function hideAlert() {
+      const box = document.getElementById('alertBox');
+      box.className = 'hidden';
+    }
+
+    function switchAuthMode(mode) {
+      hideAlert();
+
+      const tabContainer = document.getElementById('tabContainer');
+      const tabLogin = document.getElementById('tabLogin');
+      const tabRegister = document.getElementById('tabRegister');
+      const formLogin = document.getElementById('formLogin');
+      const formRegister = document.getElementById('formRegister');
+      const formOtpVerify = document.getElementById('formOtpVerify');
+      const subHeader = document.getElementById('subHeaderText');
+
+      formOtpVerify.classList.add('hidden');
+      tabContainer.classList.remove('hidden');
+
+      if (mode === 'login') {
+        tabLogin.className = 'flex-1 py-1.5 rounded-md bg-emerald-600 text-white transition';
+        tabRegister.className = 'flex-1 py-1.5 rounded-md text-slate-400 hover:text-white transition';
+        formLogin.classList.remove('hidden');
+        formRegister.classList.add('hidden');
+        subHeader.innerText = 'Masuk untuk mengakses terminal pasar modal';
+      } else if (mode === 'register') {
+        tabLogin.className = 'flex-1 py-1.5 rounded-md text-slate-400 hover:text-white transition';
+        tabRegister.className = 'flex-1 py-1.5 rounded-md bg-emerald-600 text-white transition';
+        formLogin.classList.add('hidden');
+        formRegister.classList.remove('hidden');
+        subHeader.innerText = 'Buat akun trader baru via verifikasi email OTP';
+      }
+    }
+
+    async function handleLoginSubmit(e) {
+      e.preventDefault();
+      hideAlert();
+      const btn = document.getElementById('btnLoginSubmit');
+      const btnText = document.getElementById('loginBtnText');
+      const email = document.getElementById('loginEmail').value.trim();
+      const password = document.getElementById('loginPassword').value;
+
+      btn.disabled = true;
+      btnText.innerText = 'MEMVERIFIKASI...';
+
+      try {
+        const res = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+
+        const data = await res.json();
+
+        if (res.ok && data.status === 'success') {
+          btnText.innerText = 'BERHASIL! MEMUAT...';
+          const targetUrl = data.redirect || (data.role === 'owner' ? '/admin' : '/');
+          window.location.replace(targetUrl);
+        } else {
+          showAlert(data.message || 'Login gagal. Periksa kembali email dan password Anda.');
+          btn.disabled = false;
+          btnText.innerText = 'MASUK KE TERMINAL';
+        }
+      } catch (err) {
+        showAlert('Gagal terhubung ke server terminal.');
+        btn.disabled = false;
+        btnText.innerText = 'MASUK KE TERMINAL';
+      }
+    }
+
+    async function handleRegisterSubmit(e) {
+      e.preventDefault();
+      hideAlert();
+      const btn = document.getElementById('btnRegisterSubmit');
+      const btnText = document.getElementById('regBtnText');
+
+      const name = document.getElementById('regName').value.trim();
+      const email = document.getElementById('regEmail').value.trim();
+      const password = document.getElementById('regPassword').value;
+      const confirmPassword = document.getElementById('regPasswordConfirm').value;
+
+      if (password.length < 6) {
+        showAlert('Password minimal terdiri dari 6 karakter.');
+        return;
+      }
+
+      if (password !== confirmPassword) {
+        showAlert('Konfirmasi password tidak cocok.');
+        return;
+      }
+
+      btn.disabled = true;
+      btnText.innerText = 'MENGIRIM KODE OTP...';
+
+      try {
+        const res = await fetch('/api/auth/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, email, password })
+        });
+
+        const data = await res.json();
+
+        if (data.status === 'success') {
+          currentRegEmail = email;
+          document.getElementById('otpTargetEmailText').innerText = email;
+          
+          document.getElementById('formRegister').classList.add('hidden');
+          document.getElementById('tabContainer').classList.add('hidden');
+          document.getElementById('formOtpVerify').classList.remove('hidden');
+          document.getElementById('subHeaderText').innerText = 'Verifikasi Kode Keamanan Email';
+          
+          showAlert(data.message || 'Kode OTP 6 digit telah dikirim ke email Anda!', true);
+          document.getElementById('otpCodeInput').focus();
+        } else {
+          showAlert(data.message || 'Gagal mengirim kode verifikasi.');
+        }
+      } catch (err) {
+        showAlert('Gagal terhubung ke server registrasi: ' + err.message);
+      } finally {
+        btn.disabled = false;
+        btnText.innerText = 'KIRIM KODE OTP EMAIL';
+      }
+    }
+
+    async function handleOtpSubmit(e) {
+      e.preventDefault();
+      hideAlert();
+      const btn = document.getElementById('btnOtpSubmit');
+      const btnText = document.getElementById('otpBtnText');
+      const otp = document.getElementById('otpCodeInput').value.trim();
+
+      if (otp.length !== 6) {
+        showAlert('Masukkan 6 digit kode OTP secara lengkap.');
+        return;
+      }
+
+      btn.disabled = true;
+      btnText.innerText = 'MENGECEK KODE...';
+
+      try {
+        const res = await fetch('/api/auth/verify-otp', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: currentRegEmail, otp })
+        });
+
+        const data = await res.json();
+
+        if (res.ok && data.status === 'success') {
+          showAlert('Verifikasi sukses! Masuk ke terminal...', true);
+          btnText.innerText = 'BERHASIL! MEMUAT...';
+          setTimeout(() => {
+            window.location.replace('/');
+          }, 800);
+        } else {
+          showAlert(data.message || 'Kode OTP salah atau kadaluarsa.');
+          btn.disabled = false;
+          btnText.innerText = 'VERIFIKASI & MASUK TERMINAL';
+        }
+      } catch (err) {
+        showAlert('Gagal menghubungi server untuk verifikasi OTP.');
+        btn.disabled = false;
+        btnText.innerText = 'VERIFIKASI & MASUK TERMINAL';
+      }
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,16 @@
+{
+  "name": "stockscreener",
+  "version": "1.0.0",
+  "description": "IDX Screener Bot",
+  "main": "index.js",
+  "dependencies": {
+    "axios": "^1.20.0",
+    "bcryptjs": "^3.0.3",
+    "cookie": "^1.1.1",
+    "dotenv": "^16.6.1",
+    "jsonwebtoken": "^9.0.3",
+    "node-cron": "^3.0.3",
+    "nodemailer": "^9.1.1",
+    "telegraf": "^4.16.3"
+  }
+}

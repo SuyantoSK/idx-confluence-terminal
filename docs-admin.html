@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>IDX Confluence Pro Terminal - Owner Architecture Manual</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'JetBrains Mono', monospace;
+      -webkit-tap-highlight-color: transparent;
+    }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #080a0f; }
+    ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: #334155; }
+    .prose-custom h2 { border-bottom: 1px solid #1e293b; padding-bottom: 0.5rem; margin-top: 2.5rem; margin-bottom: 1rem; }
+    .prose-custom h3 { margin-top: 1.5rem; margin-bottom: 0.5rem; }
+  </style>
+</head>
+<body class="bg-[#080a0f] text-slate-300 min-h-screen flex flex-col selection:bg-emerald-500 selection:text-black">
+
+  <!-- TOP HEADER -->
+  <header class="border-b border-slate-800 bg-[#0c1017] px-4 sm:px-8 py-3 sticky top-0 z-50 backdrop-blur-md bg-opacity-95">
+    <div class="max-w-[1700px] mx-auto flex items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <div class="w-3 h-3 rounded-full bg-emerald-400 animate-pulse ring-4 ring-emerald-500/20"></div>
+        <span class="text-sm sm:text-base font-bold tracking-wider text-white">IDX CONFLUENCE PRO</span>
+        <span class="text-[10px] px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30 font-bold uppercase">Owner Manual v2.5</span>
+      </div>
+      <div class="flex items-center gap-2 sm:gap-3">
+        <button onclick="window.print()" class="text-xs px-3 py-1.5 rounded bg-[#141a24] hover:bg-slate-800 text-slate-300 border border-slate-700 font-semibold flex items-center gap-1.5 transition">
+          <span>️ Cetak / PDF</span>
+        </button>
+        <a href="/admin" class="text-xs px-3 py-1.5 rounded bg-amber-600 hover:bg-amber-500 text-black font-bold transition flex items-center gap-1">
+          <span>⚙ Panel Admin</span>
+        </a>
+        <a href="/" class="text-xs px-3 py-1.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 font-bold transition flex items-center gap-1">
+          <span>← Terminal</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN WRAPPER -->
+  <div class="max-w-[1700px] w-full mx-auto p-4 sm:p-6 lg:p-8 grid grid-cols-1 lg:grid-cols-12 gap-8 flex-1">
+
+    <!-- SIDEBAR NAVIGATION -->
+    <aside class="hidden lg:block lg:col-span-3">
+      <div class="sticky top-20 bg-[#0c1017] border border-slate-800 rounded-xl p-4 max-h-[calc(100vh-6rem)] overflow-y-auto">
+        <div class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3 px-2 flex items-center justify-between">
+          <span>Daftar Isi Manual</span>
+          <span class="text-[9px] text-emerald-400 font-mono">COMPLETE</span>
+        </div>
+        <nav class="space-y-1 text-[11px]">
+          <div class="text-slate-500 font-bold uppercase text-[9px] px-2 pt-2">Bagian I: Overview</div>
+          <a href="#bab-1" class="block px-2.5 py-1 rounded hover:bg-[#141a24] hover:text-white text-slate-400 transition">1. Overview & Topologi Visual</a>
+          <a href="#bab-2" class="block px-2.5 py-1 rounded hover:bg-[#141a24] hover:text-white text-slate-400 transition">2. Master Kredensial & Storage</a>
+
+          <div class="text-slate-500 font-bold uppercase text-[9px] px-2 pt-2">Bagian II: Keamanan & Sesi</div>
+          <a href="#bab-3" class="block px-2.5 py-1 rounded hover:bg-[#141a24] hover:text-white text-slate-400 transition">3. Pendaftaran & Socket TLS</a>
+          <a href="#bab-4" class="block px-2.5 py-1 rounded hover:bg-[#141a24] hover:text-white text-slate-400 transition">4. Login, Brute Force & Token</a>
+          <a href="#bab-5" class="block px-2.5 py-1 rounded hover:bg-[#141a24] hover:text-white text-slate-400 transition">5. RBAC & Tiering Access</a>
+
+          <div class="text-slate-500 font-bold uppercase text-[9px] px-2 pt-2">Bagian III: Mesin Screener</div>
+          <a href="#bab-6" class="block px-2.5 py-1 rounded hover:bg-[#141a24] hover:text-white text-slate-400 transition">6. Data Pasar & Universe</a>
+          <a href="#bab-7" class="block px-2.5 py-1 rounded hover:bg-[#141a24] hover:text-white text-slate-400 transition">7. Formula & Metodologi</a>
+          <a href="#bab-8" class="block px-2.5 py-1 rounded hover:bg-[#141a24] hover:text-white text-slate-400 transition">8. Sinyal & Rekomendasi</a>
+          <a href="#bab-9" class="block px-2.5 py-1 rounded hover:bg-[#141a24] hover:text-white text-slate-400 transition">9. Modul Khusus PRO</a>
+          <a href="#bab-10" class="block px-2.5 py-1 rounded hover:bg-[#141a24] hover:text-white text-slate-400 transition">10. Automated Reporting</a>
+
+          <div class="text-slate-500 font-bold uppercase text-[9px] px-2 pt-2">Bagian IV: Frontend & Chart</div>
+          <a href="#bab-11" class="block px-2.5 py-1 rounded hover:bg-[#141a24] hover:text-white text-slate-400 transition">11. Dashboard UI/UX & Tables</a>
+          <a href="#bab-12" class="block px-2.5 py-1 rounded hover:bg-[#141a24] hover:text-white text-slate-400 transition">12. TradingView Charts Dual-Pane</a>
+
+          <div class="text-slate-500 font-bold uppercase text-[9px] px-2 pt-2">Bagian V: Monetisasi & Panel</div>
+          <a href="#bab-13" class="block px-2.5 py-1 rounded hover:bg-[#141a24] hover:text-white text-slate-400 transition">13. Payment Gateway Midtrans</a>
+          <a href="#bab-14" class="block px-2.5 py-1 rounded hover:bg-[#141a24] hover:text-white text-slate-400 transition">14. Owner Control Center</a>
+
+          <div class="text-slate-500 font-bold uppercase text-[9px] px-2 pt-2">Bagian VI & VII: Kode & SOP</div>
+          <a href="#bab-15" class="block px-2.5 py-1 rounded hover:bg-[#141a24] hover:text-white text-slate-400 transition">15-19. Blueprint Struktur Berkas</a>
+          <a href="#bab-20" class="block px-2.5 py-1 rounded hover:bg-[#141a24] hover:text-white text-slate-400 transition">20. SOP & Runbook Troubleshooting</a>
+        </nav>
+      </div>
+    </aside>
+
+    <!-- CONTENT BODY -->
+    <main class="lg:col-span-9 prose-custom max-w-none text-slate-300">
+
+      <!-- COVER CARD -->
+      <div class="bg-gradient-to-br from-[#0e1626] to-[#0a0e17] border border-slate-800 rounded-2xl p-6 sm:p-8 mb-8 shadow-xl">
+        <div class="flex items-center gap-2 mb-3">
+          <span class="text-xs font-bold px-2.5 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">MASTER SYSTEM MANUAL</span>
+          <span class="text-xs font-bold px-2.5 py-0.5 rounded bg-amber-500/10 text-amber-400 border border-amber-500/30">CONFIDENTIAL (OWNER ONLY)</span>
+        </div>
+        <h1 class="text-2xl sm:text-4xl font-extrabold text-white tracking-tight leading-tight">
+          IDX Confluence Pro Terminal: Owner Architecture Manual
+        </h1>
+        <p class="text-slate-400 text-xs sm:text-sm mt-3 leading-relaxed">
+          Buku panduan arsitektur sistem menyeluruh, cetak biru logika kuantitatif, protokol keamanan, algoritma screener, dan prosedur operasional standar (SOP).
+        </p>
+        <div class="mt-6 pt-4 border-t border-slate-800/80 flex flex-wrap gap-4 text-[11px] text-slate-400">
+          <div>Status: <span class="font-bold text-emerald-400">Production Ready</span></div>
+          <div>Runtime: <span class="font-bold text-white">Node.js Native (Zero-Dependency)</span></div>
+          <div>Container: <span class="font-bold text-cyan-400">idx_standalone_screener</span></div>
+          <div>Owner: <span class="font-bold text-amber-300">abusalmanibrahim@gmail.com</span></div>
+        </div>
+      </div>
+
+      <!-- BAGIAN I -->
+      <div class="text-xs font-bold text-emerald-400 tracking-widest uppercase">Bagian I</div>
+      <h2 id="bab-1" class="text-xl sm:text-2xl font-bold text-white">Bab 1. Overview Sistem & Filosofi Desain</h2>
+      <div class="space-y-4 text-xs sm:text-sm text-slate-400 leading-relaxed">
+        <h3 class="text-base font-bold text-slate-200">1.1 Visi Sistem: Zero-Dependency Native Architecture</h3>
+        <p>
+          Server dibangun secara murni memanfaatkan pustaka bawaan Node.js (<code class="text-white">http</code>, <code class="text-white">https</code>, <code class="text-white">tls</code>, <code class="text-white">crypto</code>, <code class="text-white">fs</code>, <code class="text-white">url</code>, <code class="text-white">path</code>). Tidak ada dependensi ke Express framework ataupun Nodemailer. Ini meminimalkan attack surface, meniadakan risiko breaking changes dari package eksternal, dan menjaga penggunaan RAM di bawah 70 MB.
+        </p>
+
+        <h3 class="text-base font-bold text-slate-200">1.2 Topologi Jaringan & Visual Flow Infrastruktur</h3>
+        <p>
+          Akses masuk internet diarahkan melalui Cloudflare DNS/SSL ke domain publik <code class="text-cyan-400">terminal.abusalman.my.id</code>. Trafik diteruskan melalui jaringan virtual mesh ZeroTier menuju host server lokal sebelum dipetakan oleh reverse proxy Nginx ke container internal port 3000.
+        </p>
+
+        <!-- DIAGRAM SVG 1: NETWORK TOPOLOGY -->
+        <div class="bg-[#0b0e14] border border-slate-800 rounded-2xl p-4 sm:p-6 my-6 shadow-2xl overflow-x-auto">
+          <svg viewBox="0 0 840 240" class="w-full min-w-[700px] h-auto font-mono select-none" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="netCard" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#141c28" />
+                <stop offset="100%" stop-color="#0d131d" />
+              </linearGradient>
+            </defs>
+            <!-- NODE 1: CLIENT -->
+            <rect x="20" y="70" width="130" height="90" rx="8" fill="url(#netCard)" stroke="#38bdf8" stroke-width="1.5"/>
+            <text x="45" y="105" fill="#38bdf8" font-size="12" font-weight="bold">TRADER</text>
+            <text x="35" y="125" fill="#94a3b8" font-size="9">Browser Client</text>
+            <text x="35" y="140" fill="#64748b" font-size="8">Desktop / Mobile</text>
+
+            <path d="M 150 115 L 185 115" stroke="#334155" stroke-width="2"/>
+            <text x="155" y="105" fill="#64748b" font-size="8">HTTPS</text>
+
+            <!-- NODE 2: CLOUDFLARE -->
+            <rect x="185" y="70" width="130" height="90" rx="8" fill="url(#netCard)" stroke="#f59e0b" stroke-width="1.5"/>
+            <text x="200" y="105" fill="#fbbf24" font-size="12" font-weight="bold">CLOUDFLARE</text>
+            <text x="198" y="125" fill="#94a3b8" font-size="9">DNS &amp; Edge SSL</text>
+            <text x="202" y="140" fill="#64748b" font-size="8">Port 443 Strict</text>
+
+            <path d="M 315 115 L 350 115" stroke="#334155" stroke-width="2"/>
+            <text x="320" y="105" fill="#64748b" font-size="8">MESH</text>
+
+            <!-- NODE 3: ZEROTIER -->
+            <rect x="350" y="70" width="130" height="90" rx="8" fill="url(#netCard)" stroke="#c084fc" stroke-width="1.5"/>
+            <text x="375" y="105" fill="#c084fc" font-size="12" font-weight="bold">ZEROTIER</text>
+            <text x="365" y="125" fill="#94a3b8" font-size="9">Virtual Network</text>
+            <text x="362" y="140" fill="#64748b" font-size="8">Private SDN Mesh</text>
+
+            <path d="M 480 115 L 515 115" stroke="#334155" stroke-width="2"/>
+            <text x="485" y="105" fill="#64748b" font-size="8">LOCAL</text>
+
+            <!-- NODE 4: HOST NGINX -->
+            <rect x="515" y="70" width="130" height="90" rx="8" fill="url(#netCard)" stroke="#10b981" stroke-width="1.5"/>
+            <text x="535" y="105" fill="#34d399" font-size="12" font-weight="bold">HOST NAS</text>
+            <text x="532" y="125" fill="#94a3b8" font-size="9">XPEnology Linux</text>
+            <text x="530" y="140" fill="#64748b" font-size="8">Nginx Reverse Proxy</text>
+
+            <path d="M 645 115 L 680 115" stroke="#334155" stroke-width="2"/>
+            <text x="647" y="105" fill="#10b981" font-size="8">:3000</text>
+
+            <!-- NODE 5: DOCKER CONTAINER -->
+            <rect x="680" y="55" width="140" height="120" rx="8" fill="#1e293b" stroke="#38bdf8" stroke-width="2"/>
+            <rect x="690" y="65" width="120" height="20" rx="4" fill="#0284c7"/>
+            <text x="702" y="79" fill="#ffffff" font-size="8" font-weight="bold">DOCKER CONTAINER</text>
+            <text x="695" y="105" fill="#38bdf8" font-size="10" font-weight="bold">idx_screener</text>
+            <text x="695" y="125" fill="#94a3b8" font-size="9">web.js Backend</text>
+            <text x="695" y="145" fill="#34d399" font-size="8">Pure Node.js :3000</text>
+            <text x="695" y="160" fill="#f59e0b" font-size="8">x-forwarded-for</text>
+          </svg>
+        </div>
+
+        <h3 class="text-base font-bold text-slate-200">1.3 Penanganan Real IP Klien</h3>
+        <p>
+          Container mengekspos port internal <code class="text-white">3000</code>. Deteksi IP klien untuk proteksi rate limiting menggunakan fallback berjenjang:
+          <code class="text-cyan-300 font-mono">req.headers['x-forwarded-for'] || req.socket.remoteAddress || 'unknown-ip'</code>, memastikan penalti pemblokiran tepat sasaran pada IP penyerang dan bukan IP proxy lokal.
+        </p>
+      </div>
+
+      <h2 id="bab-2" class="text-xl sm:text-2xl font-bold text-white mt-8">Bab 2. Master Kredensial & Variabel Lingkungan</h2>
+      <div class="space-y-4 text-xs sm:text-sm text-slate-400 leading-relaxed">
+        <h3 class="text-base font-bold text-slate-200">2.1 Akses Root / Akun Owner Utama</h3>
+        <p>
+          Akun pemegang kontrol penuh sistem terdaftar dengan email <code class="text-amber-300">abusalmanibrahim@gmail.com</code> dengan role <code class="text-purple-300">owner</code>. Akun ini memiliki kuota rescan permanen (999.999x) dan dilindungi dari opsi penghapusan mandiri pada API admin.
+        </p>
+
+        <h3 class="text-base font-bold text-slate-200">2.2 Konfigurasi TLS SMTP Relay Gmail (Port 465)</h3>
+        <p>
+          Pengiriman email autentikasi menggunakan Google App Password 16 digit:
+          <br>• User: <code class="text-white">abusalmanibrahim@gmail.com</code>
+          <br>• App Password: <code class="text-amber-300">anow vrjm oygz ufsq</code> (Dibersihkan dari spasi oleh server: `anowvrjmoygzufsq`).
+        </p>
+
+        <h3 class="text-base font-bold text-slate-200">2.3 Konfigurasi Payment Gateway Midtrans Snap</h3>
+        <p>
+          Endpoint pembayaran terkoneksi langsung ke server produksi Midtrans (<code class="text-cyan-400">app.midtrans.com</code>) menggunakan Client Key Frontend <code class="text-white">VT-client-WMSXC07x_2Cfa4oB</code> dan Server Key internal.
+        </p>
+
+        <h3 class="text-base font-bold text-slate-200">2.4 Struktur Skema Database JSON & Mekanisme Self-Healing</h3>
+        <p>
+          Database berbasis berkas <code class="text-white">users.json</code>. Jika berkas ini tidak sengaja terhapus, korup, atau kosong saat startup, fungsi <code class="text-emerald-400">loadUsers()</code> secara otomatis membangkitkan struktur data baru lengkap dengan akun default Owner, sehingga sistem tidak pernah mengalami crash fatal akibat hilangnya file storage.
+        </p>
+      </div>
+
+      <!-- BAGIAN II -->
+      <div class="text-xs font-bold text-emerald-400 tracking-widest uppercase mt-12">Bagian II</div>
+      <h2 id="bab-3" class="text-xl sm:text-2xl font-bold text-white">Bab 3. Protokol Pendaftaran Akun & Native TLS OTP</h2>
+      <div class="space-y-4 text-xs sm:text-sm text-slate-400 leading-relaxed">
+        <h3 class="text-base font-bold text-slate-200">3.1 Siklus Hidup OTP & State Machine TLS Port 465</h3>
+        <p>
+          Pendaftaran memicu pembentukan socket TLS murni langsung ke <code class="text-white">smtp.gmail.com:465</code> tanpa library eksternal:
+        </p>
+
+        <!-- DIAGRAM SVG 2: TLS STATE MACHINE -->
+        <div class="bg-[#0b0e14] border border-slate-800 rounded-2xl p-4 sm:p-6 my-6 shadow-2xl overflow-x-auto">
+          <svg viewBox="0 0 840 240" class="w-full min-w-[720px] h-auto font-mono select-none" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="tlsBox" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#141c28" />
+                <stop offset="100%" stop-color="#0d131d" />
+              </linearGradient>
+            </defs>
+            <rect x="20" y="30" width="135" height="75" rx="6" fill="url(#tlsBox)" stroke="#10b981" stroke-width="1.5"/>
+            <text x="35" y="55" fill="#10b981" font-size="11" font-weight="bold">1. TLS CONNECT</text>
+            <text x="35" y="75" fill="#f8fafc" font-size="9">smtp.gmail.com:465</text>
+            <text x="35" y="90" fill="#94a3b8" font-size="8">Expect 220 Ready</text>
+
+            <path d="M 155 67 L 185 67" stroke="#334155" stroke-width="2"/>
+
+            <rect x="185" y="30" width="135" height="75" rx="6" fill="url(#tlsBox)" stroke="#38bdf8" stroke-width="1.5"/>
+            <text x="200" y="55" fill="#38bdf8" font-size="11" font-weight="bold">2. EHLO &amp; AUTH</text>
+            <text x="200" y="75" fill="#f8fafc" font-size="9">AUTH LOGIN</text>
+            <text x="200" y="90" fill="#94a3b8" font-size="8">Base64 User &amp; Pass</text>
+
+            <path d="M 320 67 L 350 67" stroke="#334155" stroke-width="2"/>
+
+            <rect x="350" y="30" width="135" height="75" rx="6" fill="url(#tlsBox)" stroke="#c084fc" stroke-width="1.5"/>
+            <text x="365" y="55" fill="#c084fc" font-size="11" font-weight="bold">3. ENVELOPE</text>
+            <text x="365" y="75" fill="#f8fafc" font-size="9">MAIL FROM / RCPT</text>
+            <text x="365" y="90" fill="#94a3b8" font-size="8">Expect 250 OK</text>
+
+            <path d="M 485 67 L 515 67" stroke="#334155" stroke-width="2"/>
+
+            <rect x="515" y="30" width="135" height="75" rx="6" fill="url(#tlsBox)" stroke="#fbbf24" stroke-width="1.5"/>
+            <text x="530" y="55" fill="#fbbf24" font-size="11" font-weight="bold">4. DATA BODY</text>
+            <text x="530" y="75" fill="#f8fafc" font-size="9">HTML Template</text>
+            <text x="530" y="90" fill="#94a3b8" font-size="8">6-Digit Code (\r\n.\r\n)</text>
+
+            <path d="M 650 67 L 680 67" stroke="#334155" stroke-width="2"/>
+
+            <rect x="680" y="30" width="135" height="75" rx="6" fill="url(#tlsBox)" stroke="#f43f5e" stroke-width="1.5"/>
+            <text x="695" y="55" fill="#f43f5e" font-size="11" font-weight="bold">5. CLOSE &amp; QUIT</text>
+            <text x="695" y="75" fill="#f8fafc" font-size="9">QUIT Socket</text>
+            <text x="695" y="90" fill="#94a3b8" font-size="8">Resolve Promise</text>
+
+            <rect x="20" y="130" width="795" height="85" rx="8" fill="#141a24" stroke="#334155" stroke-width="1"/>
+            <text x="40" y="155" fill="#38bdf8" font-size="11" font-weight="bold">ISOLASI MEMORI TRANSIEN (TTL 5 MENIT):</text>
+            <text x="40" y="175" fill="#94a3b8" font-size="10">• Data pendaftar &amp; OTP disimpan sementara di in-memory Map pendingRegistrations.</text>
+            <text x="40" y="195" fill="#94a3b8" font-size="10">• Database users.json tidak disentuh sebelum kode verifikasi 6 digit dinyatakan lolos.</text>
+          </svg>
+        </div>
+      </div>
+
+      <h2 id="bab-4" class="text-xl sm:text-2xl font-bold text-white mt-8">Bab 4. Alur Login, Brute Force & Manajemen Sesi</h2>
+      <div class="space-y-4 text-xs sm:text-sm text-slate-400 leading-relaxed">
+        <h3 class="text-base font-bold text-slate-200">4.1 Alur Logika Brute Force Shield & Cooldown Penalti</h3>
+        <p>
+          Diagram alir bagaimana sistem menyaring kredensial dan menjatuhkan penalti penguncian selama 15 menit:
+        </p>
+
+        <!-- DIAGRAM SVG 3: BRUTE FORCE SHIELD -->
+        <div class="bg-[#0b0e14] border border-slate-800 rounded-2xl p-4 sm:p-6 my-6 shadow-2xl overflow-x-auto">
+          <svg viewBox="0 0 840 250" class="w-full min-w-[720px] h-auto font-mono select-none" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="shieldBox" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#141c28" />
+                <stop offset="100%" stop-color="#0d131d" />
+              </linearGradient>
+            </defs>
+            <rect x="20" y="80" width="120" height="70" rx="6" fill="url(#shieldBox)" stroke="#38bdf8" stroke-width="1.5"/>
+            <text x="35" y="105" fill="#38bdf8" font-size="11" font-weight="bold">POST LOGIN</text>
+            <text x="35" y="125" fill="#94a3b8" font-size="9">Email &amp; Pass</text>
+
+            <path d="M 140 115 L 180 115" stroke="#334155" stroke-width="2"/>
+
+            <polygon points="250,75 320,115 250,155 180,115" fill="#1e293b" stroke="#f59e0b" stroke-width="1.5"/>
+            <text x="220" y="112" fill="#fbbf24" font-size="9" font-weight="bold">Locked?</text>
+            <text x="215" y="124" fill="#94a3b8" font-size="8">Date.now()</text>
+
+            <path d="M 250 75 L 250 35 L 360 35" stroke="#f43f5e" stroke-width="1.5"/>
+            <rect x="360" y="15" width="220" height="40" rx="6" fill="#881337" stroke="#f43f5e" stroke-width="1"/>
+            <text x="375" y="38" fill="#ffffff" font-size="10" font-weight="bold">REJECT: HTTP 429 LOCKOUT</text>
+
+            <path d="M 320 115 L 360 115" stroke="#334155" stroke-width="2"/>
+            <text x="330" y="108" fill="#10b981" font-size="8">Tidak</text>
+
+            <polygon points="430,75 500,115 430,155 360,115" fill="#1e293b" stroke="#38bdf8" stroke-width="1.5"/>
+            <text x="405" y="112" fill="#38bdf8" font-size="9" font-weight="bold">Valid?</text>
+            <text x="395" y="124" fill="#94a3b8" font-size="8">SHA256/Plain</text>
+
+            <path d="M 500 115 L 560 115" stroke="#10b981" stroke-width="2"/>
+            <text x="515" y="108" fill="#10b981" font-size="8">Ya</text>
+            <rect x="560" y="85" width="250" height="60" rx="6" fill="#064e3b" stroke="#10b981" stroke-width="1.5"/>
+            <text x="575" y="110" fill="#34d399" font-size="11" font-weight="bold">BERHASIL: SET JWT COOKIE</text>
+            <text x="575" y="128" fill="#94a3b8" font-size="9">Clear Fail Count • 30 Days Token</text>
+
+            <path d="M 430 155 L 430 205 L 560 205" stroke="#f43f5e" stroke-width="1.5"/>
+            <text x="440" y="180" fill="#f43f5e" font-size="8">Salah</text>
+            <rect x="560" y="180" width="250" height="50" rx="6" fill="#450a0a" stroke="#f43f5e" stroke-width="1"/>
+            <text x="575" y="202" fill="#f87171" font-size="10" font-weight="bold">FAIL COUNT++ (4x = LOCK 15M)</text>
+            <text x="575" y="218" fill="#94a3b8" font-size="8">Bila 4x: lockedUntil = Date.now() + 15m</text>
+          </svg>
+        </div>
+      </div>
+
+      <h2 id="bab-5" class="text-xl sm:text-2xl font-bold text-white mt-8">Bab 5. Manajemen Hak Akses & Tiering (RBAC Engine)</h2>
+      <div class="space-y-4 text-xs sm:text-sm text-slate-400 leading-relaxed">
+        <h3 class="text-base font-bold text-slate-200">5.1 Matriks Otorisasi: owner, pro, dan free</h3>
+        <p>
+          Sistem menerapkan pembatasan bertingkat pada endpoint backend dan komponen visual antarmuka:
+          <br>• <b class="text-slate-300">FREE:</b> Hanya dapat memantau LQ45, kuota rescan 3x harian, fitur khusus terkunci.
+          <br>• <b class="text-emerald-400">PRO:</b> Akses seluruh saham IHSG, Strong Buy, Foreign Flow, Bandarmology, VPA Scanner, Unlimited Rescan.
+          <br>• <b class="text-amber-300">OWNER:</b> Full Root Access, Manajemen User CRUD, Reset Sesi Rate Limiter.
+        </p>
+      </div>
+
+      <!-- BAGIAN III -->
+      <div class="text-xs font-bold text-emerald-400 tracking-widest uppercase mt-12">Bagian III</div>
+      <h2 id="bab-6" class="text-xl sm:text-2xl font-bold text-white">Bab 6. Integrasi Data Pasar & Universe Emiten</h2>
+      <div class="space-y-4 text-xs sm:text-sm text-slate-400 leading-relaxed">
+        <h3 class="text-base font-bold text-slate-200">6.1 Pipeline Data Yahoo Finance v8 & Konversi UNIX Waktu</h3>
+        <p>
+          Data ditarik secara periodik via HTTPS pipeline dari endpoint Yahoo Finance v8 dengan rentang 6 bulan (`range=6mo&interval=1d`). Timestamp detik dikalikan 1000 dan dikonversi ke kalender ISO (`YYYY-MM-DD`).
+        </p>
+      </div>
+
+      <!-- BAB 7: FORMULA ENGINE DIAGRAM -->
+      <h2 id="bab-7" class="text-xl sm:text-2xl font-bold text-white mt-8">Bab 7. Formula Dasar & Algoritma Analisa Konfluensi</h2>
+      <div class="space-y-4 text-xs sm:text-sm text-slate-400 leading-relaxed">
+        <p>
+          Hierarki formula matematika bursa, pembobotan kuantitatif, dan indikator teknikal konfluensi yang dihitung otomatis oleh server:
+        </p>
+
+        <!-- DIAGRAM SVG 4: FORMULA ENGINE -->
+        <div class="bg-[#0b0e14] border border-slate-800 rounded-2xl p-4 sm:p-6 my-6 shadow-2xl overflow-x-auto">
+          <svg viewBox="0 0 840 440" class="w-full min-w-[720px] h-auto font-mono select-none" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="gradMathRoot" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#1e293b" />
+                <stop offset="100%" stop-color="#0f172a" />
+              </linearGradient>
+              <linearGradient id="gradMathCard" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#141c28" />
+                <stop offset="100%" stop-color="#0d131d" />
+              </linearGradient>
+              <filter id="shadowMath" x="-5%" y="-5%" width="110%" height="110%">
+                <feDropShadow dx="0" dy="4" stdDeviation="4" flood-color="#000000" flood-opacity="0.5"/>
+              </filter>
+            </defs>
+
+            <!-- ROOT BADGE -->
+            <rect x="40" y="25" width="310" height="42" rx="8" fill="url(#gradMathRoot)" stroke="#10b981" stroke-width="1.5" filter="url(#shadowMath)"/>
+            <circle cx="65" cy="46" r="6" fill="#10b981"/>
+            <text x="85" y="51" fill="#34d399" font-size="13" font-weight="bold">CONFLUENCE_ENGINE</text>
+            <text x="255" y="51" fill="#94a3b8" font-size="10">[Core Logic]</text>
+
+            <path d="M 65 67 L 65 400" stroke="#334155" stroke-width="2" stroke-dasharray="4 4"/>
+
+            <!-- NODE 1 -->
+            <path d="M 65 105 L 120 105" stroke="#10b981" stroke-width="1.5"/>
+            <rect x="120" y="85" width="680" height="42" rx="6" fill="url(#gradMathCard)" stroke="#10b981" stroke-width="1" filter="url(#shadowMath)"/>
+            <text x="135" y="110" fill="#10b981" font-size="12" font-weight="bold">VPA Ratio</text>
+            <text x="245" y="110" fill="#f8fafc" font-size="11">Current Volume / SMA(Volume, 20)</text>
+            <text x="560" y="110" fill="#94a3b8" font-size="10">• Std Akumulasi: ≥ 2.0x</text>
+
+            <!-- NODE 2 -->
+            <path d="M 65 160 L 120 160" stroke="#fbbf24" stroke-width="1.5"/>
+            <rect x="120" y="140" width="680" height="42" rx="6" fill="url(#gradMathCard)" stroke="#fbbf24" stroke-width="1" filter="url(#shadowMath)"/>
+            <text x="135" y="165" fill="#fbbf24" font-size="12" font-weight="bold">Dean Score</text>
+            <text x="245" y="165" fill="#f8fafc" font-size="11">|ΔPrice%| × VPA × 0.00015</text>
+            <text x="560" y="165" fill="#94a3b8" font-size="10">• Format: toExponential(3)</text>
+
+            <!-- NODE 3 -->
+            <path d="M 65 215 L 120 215" stroke="#c084fc" stroke-width="1.5"/>
+            <rect x="120" y="195" width="680" height="42" rx="6" fill="url(#gradMathCard)" stroke="#c084fc" stroke-width="1" filter="url(#shadowMath)"/>
+            <text x="135" y="220" fill="#c084fc" font-size="12" font-weight="bold">RSI (14)</text>
+            <text x="245" y="220" fill="#f8fafc" font-size="11">100 - (100 / (1 + (AvgGain / AvgLoss)))</text>
+            <text x="560" y="220" fill="#94a3b8" font-size="10">• Wilder Std: OB 70 | OS 30</text>
+
+            <!-- NODE 4 -->
+            <path d="M 65 270 L 120 270" stroke="#38bdf8" stroke-width="1.5"/>
+            <rect x="120" y="250" width="680" height="42" rx="6" fill="url(#gradMathCard)" stroke="#38bdf8" stroke-width="1" filter="url(#shadowMath)"/>
+            <text x="135" y="275" fill="#38bdf8" font-size="12" font-weight="bold">MA20 / MA50</text>
+            <text x="245" y="275" fill="#f8fafc" font-size="11">SMA(Close, 20) &amp; SMA(Close, 50)</text>
+            <text x="560" y="275" fill="#94a3b8" font-size="10">• Baseline Tren Dinamis</text>
+
+            <!-- NODE 5 -->
+            <path d="M 65 325 L 120 325" stroke="#f43f5e" stroke-width="1.5"/>
+            <rect x="120" y="305" width="680" height="42" rx="6" fill="url(#gradMathCard)" stroke="#f43f5e" stroke-width="1" filter="url(#shadowMath)"/>
+            <text x="135" y="330" fill="#f43f5e" font-size="12" font-weight="bold">Support/Res</text>
+            <text x="245" y="330" fill="#f8fafc" font-size="11">Min(Low, 20D) &amp; Max(High, 20D)</text>
+            <text x="560" y="330" fill="#94a3b8" font-size="10">• Stop Loss &amp; Take Profit Base</text>
+
+            <!-- NODE 6 -->
+            <path d="M 65 380 L 120 380" stroke="#64748b" stroke-width="1.5"/>
+            <rect x="120" y="360" width="680" height="42" rx="6" fill="url(#gradMathCard)" stroke="#64748b" stroke-width="1" filter="url(#shadowMath)"/>
+            <text x="135" y="385" fill="#94a3b8" font-size="12" font-weight="bold">Lot &amp; Turnover</text>
+            <text x="245" y="385" fill="#f8fafc" font-size="11">Volume / 100 • Price × Volume</text>
+            <text x="560" y="385" fill="#94a3b8" font-size="10">• Format: Miliar (M) / Juta (Jt)</text>
+          </svg>
+        </div>
+      </div>
+
+      <!-- BAB 8: LOGIKA SINYAL DIAGRAM -->
+      <h2 id="bab-8" class="text-xl sm:text-2xl font-bold text-white mt-8">Bab 8. Engine Logika Sinyal & Rekomendasi Otomatis</h2>
+      <div class="space-y-4 text-xs sm:text-sm text-slate-400 leading-relaxed">
+        <h3 class="text-base font-bold text-slate-200">8.1 Matriks Pohon Logika Penentuan Sinyal</h3>
+        <p>
+          Pohon keputusan otomatis di backend <code class="text-white">web.js</code> untuk menetapkan status sinyal rekomendasi:
+        </p>
+
+        <!-- DIAGRAM SVG 5: SIGNAL DECISION TREE -->
+        <div class="bg-[#0b0e14] border border-slate-800 rounded-2xl p-4 sm:p-6 my-6 shadow-2xl overflow-x-auto">
+          <svg viewBox="0 0 840 370" class="w-full min-w-[720px] h-auto font-mono select-none" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="sigCard" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#141c28" />
+                <stop offset="100%" stop-color="#0d131d" />
+              </linearGradient>
+            </defs>
+
+            <rect x="30" y="160" width="130" height="50" rx="8" fill="#1e293b" stroke="#38bdf8" stroke-width="1.5"/>
+            <text x="45" y="182" fill="#38bdf8" font-size="11" font-weight="bold">CANDLE DATA</text>
+            <text x="45" y="198" fill="#94a3b8" font-size="9">VPA, FQS, MA20, RSI</text>
+
+            <path d="M 160 185 L 210 185" stroke="#334155" stroke-width="2"/>
+
+            <path d="M 210 185 L 210 45 L 260 45" stroke="#fbbf24" stroke-width="1.5"/>
+            <path d="M 210 185 L 210 115 L 260 115" stroke="#10b981" stroke-width="1.5"/>
+            <path d="M 210 185 L 260 185" stroke="#c084fc" stroke-width="1.5"/>
+            <path d="M 210 185 L 210 255 L 260 255" stroke="#f43f5e" stroke-width="1.5"/>
+            <path d="M 210 185 L 210 325 L 260 325" stroke="#64748b" stroke-width="1.5"/>
+
+            <rect x="260" y="25" width="260" height="40" rx="6" fill="url(#sigCard)" stroke="#fbbf24" stroke-width="1"/>
+            <text x="275" y="49" fill="#f8fafc" font-size="10">VPA ≥ 2.0 &amp; FQS ≥ 1.5 &amp; Up &amp; &gt;MA20</text>
+            <path d="M 520 45 L 560 45" stroke="#fbbf24" stroke-width="1.5"/>
+            <rect x="560" y="25" width="240" height="40" rx="6" fill="#78350f" stroke="#fbbf24" stroke-width="1.5"/>
+            <text x="575" y="49" fill="#fef08a" font-size="11" font-weight="bold">⚡ STRONG BUY (BREAKOUT)</text>
+
+            <rect x="260" y="95" width="260" height="40" rx="6" fill="url(#sigCard)" stroke="#10b981" stroke-width="1"/>
+            <text x="275" y="119" fill="#f8fafc" font-size="10">Up &amp; Price &gt; MA20 &amp; VPA ≥ 1.2</text>
+            <path d="M 520 115 L 560 115" stroke="#10b981" stroke-width="1.5"/>
+            <rect x="560" y="95" width="240" height="40" rx="6" fill="#064e3b" stroke="#10b981" stroke-width="1.5"/>
+            <text x="575" y="119" fill="#a7f3d0" font-size="11" font-weight="bold">BUY ON WEAKNESS</text>
+
+            <rect x="260" y="165" width="260" height="40" rx="6" fill="url(#sigCard)" stroke="#c084fc" stroke-width="1"/>
+            <text x="275" y="189" fill="#f8fafc" font-size="10">RSI (14) ≤ 32</text>
+            <path d="M 520 185 L 560 185" stroke="#c084fc" stroke-width="1.5"/>
+            <rect x="560" y="165" width="240" height="40" rx="6" fill="#581c87" stroke="#c084fc" stroke-width="1.5"/>
+            <text x="575" y="189" fill="#e9d5ff" font-size="11" font-weight="bold">⚠ OVERSOLD / REBOUND</text>
+
+            <rect x="260" y="235" width="260" height="40" rx="6" fill="url(#sigCard)" stroke="#f43f5e" stroke-width="1"/>
+            <text x="275" y="259" fill="#f8fafc" font-size="10">!Up &amp; Price &lt; MA20</text>
+            <path d="M 520 255 L 560 255" stroke="#f43f5e" stroke-width="1.5"/>
+            <rect x="560" y="235" width="240" height="40" rx="6" fill="#881337" stroke="#f43f5e" stroke-width="1.5"/>
+            <text x="575" y="259" fill="#fecdd3" font-size="11" font-weight="bold">SELL / AVOID</text>
+
+            <rect x="260" y="305" width="260" height="40" rx="6" fill="url(#sigCard)" stroke="#64748b" stroke-width="1"/>
+            <text x="275" y="329" fill="#f8fafc" font-size="10">Sideways / Tidak Ada Anomali</text>
+            <path d="M 520 325 L 560 325" stroke="#64748b" stroke-width="1.5"/>
+            <rect x="560" y="305" width="240" height="40" rx="6" fill="#1e293b" stroke="#64748b" stroke-width="1.5"/>
+            <text x="575" y="329" fill="#cbd5e1" font-size="11" font-weight="bold">WAIT &amp; SEE</text>
+          </svg>
+        </div>
+      </div>
+
+      <h2 id="bab-9" class="text-xl sm:text-2xl font-bold text-white mt-8">Bab 9. Modul Analitik Khusus (PRO Exclusive Flows)</h2>
+      <div class="space-y-4 text-xs sm:text-sm text-slate-400 leading-relaxed">
+        <h3 class="text-base font-bold text-slate-200">9.1 Top 20 Net Foreign Flow (Akumulasi vs Distribusi Asing)</h3>
+        <p>
+          Dihitung dengan formula: <code class="text-sky-300 font-mono">NetForeign = Direction × (Turnover × (Min(VPA, 3) / 5))</code>.
+          Dikelompokkan menjadi sub-tab: <b>TOP 20 BUY</b> dan <b>TOP 20 SELL</b>.
+        </p>
+
+        <h3 class="text-base font-bold text-slate-200">9.2 Bandarmology Flow & Power Score Calculation (1-100)</h3>
+        <p>
+          Mendeteksi pola bandar bursa:
+          <br>• <b>BIG ACCUM:</b> VPA $\ge 2.0\text{x}$, FQS $\ge 1.8\text{x}$, Bullish (Power score hingga 99).
+          <br>• <b>ACCUMULATION:</b> VPA $\ge 1.2\text{x}$, Bullish (Power score hingga 85).
+          <br>• <b>BIG DISTRIB:</b> VPA $\ge 2.0\text{x}$, Bearish (Power score drop ke 15).
+          <br>• <b>DISTRIBUTION:</b> VPA $\ge 1.2\text{x}$, Bearish (Power score drop ke 30).
+        </p>
+
+        <h3 class="text-base font-bold text-slate-200">9.3 VPA Spike & Pattern Recognition Scanner</h3>
+        <p>
+          Menyaring pola kuantitatif bursa:
+          <br>• <b>Absorption Breakout:</b> VPA $\ge 3.0\text{x}$ saat Bullish (Penyerapan resistensi).
+          <br>• <b>Effort to Rise:</b> VPA $\ge 1.2\text{x}$ saat Bullish.
+          <br>• <b>High Volume Sell:</b> VPA $\ge 2.0\text{x}$ saat Bearish.
+        </p>
+      </div>
+
+      <h2 id="bab-10" class="text-xl sm:text-2xl font-bold text-white mt-8">Bab 10. Automated Market Reporting</h2>
+      <div class="space-y-4 text-xs sm:text-sm text-slate-400 leading-relaxed">
+        <h3 class="text-base font-bold text-slate-200">10.1 Mekanisme Email Digest & Notifikasi Saham Harian</h3>
+        <p>
+          Arsitektur pelaporan terjadwal menggunakan modul TLS port 465 untuk mengirim ringkasan kandidat saham terbaik ke email pengguna dalam format tabel HTML dengan styling inline CSS yang rapi.
+        </p>
+      </div>
+
+      <!-- BAGIAN IV -->
+      <div class="text-xs font-bold text-emerald-400 tracking-widest uppercase mt-12">Bagian IV</div>
+      <h2 id="bab-11" class="text-xl sm:text-2xl font-bold text-white">Bab 11. Desain Visual Dashboard UI/UX</h2>
+      <div class="space-y-4 text-xs sm:text-sm text-slate-400 leading-relaxed">
+        <h3 class="text-base font-bold text-slate-200">11.1 Tailwind CSS Obsidian / Dark Terminal Theme</h3>
+        <p>
+          Antarmuka terminal didesain bertema gelap monokromatik (Obsidian `#080a0f`, Slate-800, dan Emerald-400) dengan tipografi monospace JetBrains Mono untuk kenyamanan analisa jangka panjang.
+        </p>
+      </div>
+
+      <h2 id="bab-12" class="text-xl sm:text-2xl font-bold text-white mt-8">Bab 12. Implementasi Grafik TradingView Lightweight Charts</h2>
+      <div class="space-y-4 text-xs sm:text-sm text-slate-400 leading-relaxed">
+        <h3 class="text-base font-bold text-slate-200">12.1 Penyelarasan Sumbu Skala & Price Markers</h3>
+        <p>
+          Fungsi <code class="text-emerald-400">syncPriceScaleWidths()</code> mengunci lebar piksel sumbu harga kanan pada kedua panel agar garis crosshair tegak lurus sempurna secara vertikal. Method <code class="text-cyan-300 font-mono">candleSeries.setMarkers(...)</code> menempatkan penanda harga di atas candle hari ini.
+        </p>
+      </div>
+
+      <!-- BAGIAN V -->
+      <div class="text-xs font-bold text-emerald-400 tracking-widest uppercase mt-12">Bagian V</div>
+      <h2 id="bab-13" class="text-xl sm:text-2xl font-bold text-white">Bab 13. Integrasi Pembayaran Otomatis Midtrans Snap</h2>
+      <div class="space-y-4 text-xs sm:text-sm text-slate-400 leading-relaxed">
+        <h3 class="text-base font-bold text-slate-200">13.1 Siklus Transaksi Snap Token & Webhook Settlement</h3>
+        <p>
+          Alur otomatisasi upgrade PRO 30 hari via transaksi Snap QRIS dan callback server-to-server:
+        </p>
+
+        <!-- DIAGRAM SVG 6: MIDTRANS LIFECYCLE -->
+        <div class="bg-[#0b0e14] border border-slate-800 rounded-2xl p-4 sm:p-6 my-6 shadow-2xl overflow-x-auto">
+          <svg viewBox="0 0 840 220" class="w-full min-w-[720px] h-auto font-mono select-none" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="payBox" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#141c28" />
+                <stop offset="100%" stop-color="#0d131d" />
+              </linearGradient>
+            </defs>
+
+            <rect x="20" y="40" width="135" height="80" rx="6" fill="url(#payBox)" stroke="#fbbf24" stroke-width="1.5"/>
+            <text x="35" y="65" fill="#fbbf24" font-size="11" font-weight="bold">1. KLIK UPGRADE</text>
+            <text x="35" y="85" fill="#f8fafc" font-size="9">Trader di Terminal</text>
+            <text x="35" y="100" fill="#94a3b8" font-size="8">Tagihan Rp 1.000</text>
+
+            <path d="M 155 80 L 185 80" stroke="#334155" stroke-width="2"/>
+
+            <rect x="185" y="40" width="135" height="80" rx="6" fill="url(#payBox)" stroke="#38bdf8" stroke-width="1.5"/>
+            <text x="200" y="65" fill="#38bdf8" font-size="11" font-weight="bold">2. CREATE SNAP</text>
+            <text x="200" y="85" fill="#f8fafc" font-size="9">POST Midtrans API</text>
+            <text x="200" y="100" fill="#94a3b8" font-size="8">Get Snap Token</text>
+
+            <path d="M 320 80 L 350 80" stroke="#334155" stroke-width="2"/>
+
+            <rect x="350" y="40" width="135" height="80" rx="6" fill="url(#payBox)" stroke="#c084fc" stroke-width="1.5"/>
+            <text x="365" y="65" fill="#c084fc" font-size="11" font-weight="bold">3. BAYAR QRIS</text>
+            <text x="365" y="85" fill="#f8fafc" font-size="9">Snap.js Pop-up</text>
+            <text x="365" y="100" fill="#94a3b8" font-size="8">BCA / GoPay / Shopee</text>
+
+            <path d="M 485 80 L 515 80" stroke="#334155" stroke-width="2"/>
+
+            <rect x="515" y="40" width="135" height="80" rx="6" fill="url(#payBox)" stroke="#f59e0b" stroke-width="1.5"/>
+            <text x="530" y="65" fill="#f59e0b" font-size="11" font-weight="bold">4. WEBHOOK POST</text>
+            <text x="530" y="85" fill="#f8fafc" font-size="9">/api/payment/notif</text>
+            <text x="530" y="100" fill="#94a3b8" font-size="8">Check settlement</text>
+
+            <path d="M 650 80 L 680 80" stroke="#334155" stroke-width="2"/>
+
+            <rect x="680" y="40" width="135" height="80" rx="6" fill="url(#payBox)" stroke="#10b981" stroke-width="1.5"/>
+            <text x="695" y="65" fill="#10b981" font-size="11" font-weight="bold">5. AUTO-UPGRADE</text>
+            <text x="695" y="85" fill="#f8fafc" font-size="9">Role = 'pro'</text>
+            <text x="695" y="100" fill="#34d399" font-size="8">+30 Hari Langsung</text>
+
+            <rect x="20" y="145" width="795" height="50" rx="6" fill="#141a24" stroke="#334155" stroke-width="1"/>
+            <text x="40" y="175" fill="#10b981" font-size="10" font-weight="bold">ZERO MANUAL CONFIRMATION:</text>
+            <text x="270" y="175" fill="#94a3b8" font-size="10">Database users.json diperbarui detik itu juga secara server-to-server.</text>
+          </svg>
+        </div>
+      </div>
+
+      <h2 id="bab-14" class="text-xl sm:text-2xl font-bold text-white mt-8">Bab 14. Owner Control Center (/admin)</h2>
+      <div class="space-y-4 text-xs sm:text-sm text-slate-400 leading-relaxed">
+        <h3 class="text-base font-bold text-slate-200">14.1 Pengawasan Pengguna & Manajemen Akun (CRUD)</h3>
+        <p>
+          Panel khusus Owner menyediakan tabel pemantauan seluruh user terdaftar, penambahan akun manual, dan penghapusan akun.
+        </p>
+      </div>
+
+      <!-- BAGIAN VI & VII -->
+      <div class="text-xs font-bold text-emerald-400 tracking-widest uppercase mt-12">Bagian VI & VII</div>
+      <h2 id="bab-15" class="text-xl sm:text-2xl font-bold text-white">Bab 15-19. Blueprint Struktur Berkas Sistem</h2>
+      <div class="space-y-4 text-xs sm:text-sm text-slate-400 leading-relaxed">
+        <p>
+          Visualisasi hierarki file produksi dan layer aplikasi di server host XPEnology NAS:
+        </p>
+
+        <!-- DIAGRAM SVG 7: FILE TREE HIERARCHY -->
+        <div class="bg-[#0b0e14] border border-slate-800 rounded-2xl p-4 sm:p-6 my-6 shadow-2xl overflow-x-auto">
+          <svg viewBox="0 0 820 480" class="w-full min-w-[700px] h-auto font-mono select-none" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="gradRoot" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#1e293b" />
+                <stop offset="100%" stop-color="#0f172a" />
+              </linearGradient>
+              <linearGradient id="gradCard" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#141c28" />
+                <stop offset="100%" stop-color="#0d131d" />
+              </linearGradient>
+              <filter id="shadow" x="-5%" y="-5%" width="110%" height="110%">
+                <feDropShadow dx="0" dy="4" stdDeviation="4" flood-color="#000000" flood-opacity="0.5"/>
+              </filter>
+            </defs>
+
+            <!-- ROOT BADGE -->
+            <rect x="40" y="25" width="280" height="42" rx="8" fill="url(#gradRoot)" stroke="#f59e0b" stroke-width="1.5" filter="url(#shadow)"/>
+            <circle cx="65" cy="46" r="6" fill="#f59e0b"/>
+            <text x="85" y="51" fill="#fbbf24" font-size="13" font-weight="bold">/opt/idx_screener/</text>
+            <text x="245" y="51" fill="#94a3b8" font-size="10">[Host NAS]</text>
+
+            <path d="M 65 67 L 65 440" stroke="#334155" stroke-width="2" stroke-dasharray="4 4"/>
+
+            <!-- NODE 1 -->
+            <path d="M 65 105 L 120 105" stroke="#10b981" stroke-width="1.5"/>
+            <rect x="120" y="85" width="660" height="42" rx="6" fill="url(#gradCard)" stroke="#10b981" stroke-width="1" filter="url(#shadow)"/>
+            <text x="135" y="110" fill="#10b981" font-size="12" font-weight="bold">web.js</text>
+            <text x="260" y="110" fill="#94a3b8" font-size="11">Core HTTP/API Server • Native TLS Dispatch • Yahoo Data Pipeline</text>
+
+            <!-- NODE 2 -->
+            <path d="M 65 160 L 120 160" stroke="#38bdf8" stroke-width="1.5"/>
+            <rect x="120" y="140" width="660" height="42" rx="6" fill="url(#gradCard)" stroke="#38bdf8" stroke-width="1" filter="url(#shadow)"/>
+            <text x="135" y="165" fill="#38bdf8" font-size="12" font-weight="bold">index.html</text>
+            <text x="260" y="165" fill="#94a3b8" font-size="11">Client Terminal • TradingView Charts v4.1.1 • Signal Confluence Radar</text>
+
+            <!-- NODE 3 -->
+            <path d="M 65 215 L 120 215" stroke="#c084fc" stroke-width="1.5"/>
+            <rect x="120" y="195" width="660" height="42" rx="6" fill="url(#gradCard)" stroke="#c084fc" stroke-width="1" filter="url(#shadow)"/>
+            <text x="135" y="220" fill="#c084fc" font-size="12" font-weight="bold">login.html</text>
+            <text x="260" y="220" fill="#94a3b8" font-size="11">Auth Gateway • 6-Digit Email OTP • 4x Lockout Brute-Force Shield</text>
+
+            <!-- NODE 4 -->
+            <path d="M 65 270 L 120 270" stroke="#fbbf24" stroke-width="1.5"/>
+            <rect x="120" y="250" width="660" height="42" rx="6" fill="url(#gradCard)" stroke="#fbbf24" stroke-width="1" filter="url(#shadow)"/>
+            <text x="135" y="275" fill="#fbbf24" font-size="12" font-weight="bold">admin.html</text>
+            <text x="260" y="275" fill="#94a3b8" font-size="11">Owner Control Center • User CRUD • Tier Override • Global Reset</text>
+
+            <!-- NODE 5 -->
+            <path d="M 65 325 L 120 325" stroke="#f43f5e" stroke-width="1.5"/>
+            <rect x="120" y="305" width="660" height="42" rx="6" fill="url(#gradCard)" stroke="#f43f5e" stroke-width="1" filter="url(#shadow)"/>
+            <text x="135" y="330" fill="#f43f5e" font-size="12" font-weight="bold">docs-admin.html</text>
+            <rect x="250" y="318" width="95" height="18" rx="4" fill="#881337"/>
+            <text x="256" y="331" fill="#fecdd3" font-size="9" font-weight="bold">CONFIDENTIAL</text>
+            <text x="355" y="330" fill="#94a3b8" font-size="11">Master System Architecture E-Book & Owner Guide</text>
+
+            <!-- NODE 6 -->
+            <path d="M 65 380 L 120 380" stroke="#64748b" stroke-width="1.5"/>
+            <rect x="120" y="360" width="660" height="42" rx="6" fill="url(#gradCard)" stroke="#64748b" stroke-width="1" filter="url(#shadow)"/>
+            <text x="135" y="385" fill="#94a3b8" font-size="12" font-weight="bold">docs.html</text>
+            <rect x="250" y="373" width="55" height="18" rx="4" fill="#1e293b"/>
+            <text x="260" y="386" fill="#93c5fd" font-size="9" font-weight="bold">PUBLIC</text>
+            <text x="315" y="385" fill="#94a3b8" font-size="11">Technical Methodology • Indicator Reference Guide</text>
+
+            <!-- NODE 7 -->
+            <path d="M 65 435 L 120 435" stroke="#34d399" stroke-width="1.5"/>
+            <rect x="120" y="415" width="660" height="42" rx="6" fill="url(#gradCard)" stroke="#34d399" stroke-width="1" filter="url(#shadow)"/>
+            <text x="135" y="440" fill="#34d399" font-size="12" font-weight="bold">users.json</text>
+            <text x="260" y="440" fill="#94a3b8" font-size="11">Self-Healing JSON Database • SHA-256 Hashes • RBAC State</text>
+          </svg>
+        </div>
+      </div>
+
+      <h2 id="bab-20" class="text-xl sm:text-2xl font-bold text-white mt-8">Bab 20. Standard Operating Procedures (SOP) & Runbook</h2>
+      <div class="space-y-4 text-xs sm:text-sm text-slate-400 leading-relaxed">
+        <h3 class="text-base font-bold text-slate-200">20.1 Deployment, Backup users.json, dan Restart Container</h3>
+        <div class="bg-[#0c1017] border border-slate-800 rounded-lg p-4 font-mono text-xs text-slate-300 space-y-2">
+          <div><span class="text-slate-500"># Backup database:</span><br><code class="text-emerald-400">cp users.json users_backup_$(date +%F).json</code></div>
+          <div><span class="text-slate-500"># Restart container aplikasi:</span><br><code class="text-emerald-400">sudo docker restart idx_standalone_screener</code></div>
+          <div><span class="text-slate-500"># Pantau log pengiriman OTP dan aktivitas server:</span><br><code class="text-emerald-400">sudo docker logs -f --tail 20 idx_standalone_screener</code></div>
+        </div>
+
+        <h3 class="text-base font-bold text-slate-200 mt-4">20.2 Prosedur Regenerasi Kunci Google App Password</h3>
+        <p>
+          Jika Google mencabut App Password: buka Akun Google Owner → Keamanan → Sandi Aplikasi → Buat sandi 16 digit baru → Perbarui konstanta <code class="text-white">SMTP_PASS</code> pada <code class="text-white">web.js</code> → Restart container.
+        </p>
+
+        <h3 class="text-base font-bold text-slate-200 mt-4">20.3 Penanganan Kendala Jaringan SMTP TLS (Timeout / Auth Error 535)</h3>
+        <p>
+          Pastikan port keluar 465 tidak diblokir oleh firewall ISP atau router NAS lokal. Gunakan mode IP bridge bila container gagal menjangkau <code class="text-white">smtp.gmail.com</code>.
+        </p>
+
+        <h3 class="text-base font-bold text-slate-200 mt-4">20.4 Penanganan Yahoo Finance Rate Limit & Skema Fallback Data</h3>
+        <p>
+          Jika Yahoo Finance mengembalikan respons kosong, sistem secara otomatis mempertahankan data terakhir dari memori cache 5 menit agar terminal tidak mengalami error tampilan.
+        </p>
+
+        <h3 class="text-base font-bold text-slate-200 mt-4">20.5 Prosedur Pemulihan Saat Jaringan Virtual ZeroTier Terputus</h3>
+        <p>
+          Jalankan perintah restart service ZeroTier pada host NAS: <code class="text-emerald-400">sudo systemctl restart zerotier-one</code> dan pastikan status interface berada pada kondisi <code class="text-white">OK</code>.
+        </p>
+      </div>
+
+      <!-- FOOTER NOTE -->
+      <div class="border-t border-slate-800 pt-6 mt-12 text-center text-xs text-slate-500">
+        IDX Confluence Pro Terminal • Confidential Master Architecture Manual • 100% Definitive Version
+      </div>
+
+    </main>
+
+  </div>
+
+</body>
+</html>

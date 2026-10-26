@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  stockscreener:
+    container_name: idx_standalone_screener
+    image: node:18-alpine
+    restart: always
+    working_dir: /app
+    volumes:
+      - .:/app
+    environment:
+      - PORT=3000
+    ports:
+      - "3000:3000"
+    command: sh -c "node bot.js & node web.js & wait"

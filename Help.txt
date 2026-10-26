@@ -1,0 +1,16 @@
+ *IDX STOCK SCREENER TELEGRAM BOT*
+
+ *Daftar Perintah:*
+• `/cek <KODE>` ➔ Cek harga, rasio volume & status lonjakan saham tertentu.
+  _Contoh:_ `/cek TPMA` atau `/cek AUTO`
+
+• `/topspike` ➔ Menampilkan Top 10 saham dengan lonjakan volume anomali tertinggi di bursa.
+
+• `/help` ➔ Menampilkan panduan dan daftar perintah ini.
+
+ *Panduan Indikator (Dean Earwicker):*
+• *Spike Score ≥ 1.0:* Volume anomali valid (melebihi batas standar deviasi).
+• *Harga Hijau (+) + Spike:* Indikasi akumulasi / momentum breakout.
+• *Harga Merah (-) + Spike:* Indikasi distribusi / panik jual besar.
+
+⏰ *Push Otomatis:* Bot mengirim update Top Spike setiap hari bursa jam *08:00 WIB*.

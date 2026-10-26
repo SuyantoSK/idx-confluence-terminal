@@ -1,0 +1,1626 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <title>IDX Confluence Pro Terminal</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lightweight-charts@4.1.1/dist/lightweight-charts.standalone.production.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://app.midtrans.com/snap/snap.js" data-client-key="VT-client-WMSXC07x_2Cfa4oB"></script>
+
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'JetBrains Mono', monospace;
+      -webkit-tap-highlight-color: transparent;
+    }
+    ::-webkit-scrollbar { width: 4px; height: 4px; }
+    ::-webkit-scrollbar-track { background: #080a0f; }
+    ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 2px; }
+    ::-webkit-scrollbar-thumb:hover { background: #334155; }
+  </style>
+</head>
+<body class="bg-[#080a0f] text-slate-200 min-h-screen flex flex-col selection:bg-emerald-500 selection:text-black">
+
+  <!-- TOP HEADER -->
+  <header class="border-b border-slate-800 bg-[#0c1017] px-3 sm:px-6 py-2.5">
+    <div class="max-w-[1700px] mx-auto flex items-center justify-between gap-3">
+      
+      <!-- Brand & Tier Status -->
+      <div class="flex items-center gap-2.5">
+        <div class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse ring-4 ring-emerald-500/20"></div>
+        <span class="text-sm sm:text-base font-bold tracking-wider text-white">IDX CONFLUENCE PRO</span>
+        <span id="headerRoleBadge" class="text-[10px] px-2 py-0.5 rounded bg-slate-800 text-slate-400 border border-slate-700 font-bold">FREE TIER</span>
+      </div>
+
+      <!-- User Navigation & Controls -->
+      <div class="flex items-center gap-2 sm:gap-3">
+        <span id="userNameBadgeDesktop" class="hidden md:inline text-xs text-slate-300 font-medium">User</span>
+        <span id="userNameBadgeMobile" class="md:hidden text-xs text-slate-400 truncate max-w-[80px]">User</span>
+        
+        <button id="btnTopUpgrade" onclick="openUpgradeModal('Akses Fitur PRO')" class="hidden text-xs px-2.5 py-1 rounded bg-amber-500 hover:bg-amber-400 text-black font-bold transition">
+          ⭐ UPGRADE PRO
+        </button>
+        
+        <a href="/docs" target="_blank" class="px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700 text-xs font-semibold flex items-center gap-1 transition">
+          <span>DOCS</span>
+        </a>
+        
+        <a href="/logout" class="text-xs px-2.5 py-1 rounded bg-rose-500/10 text-rose-400 border border-rose-500/20 hover:bg-rose-500/20 transition">
+          Logout
+        </a>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- DASHBOARD CONTENT -->
+  <main class="flex-1 max-w-[1700px] w-full mx-auto p-2 sm:p-4 grid grid-cols-1 lg:grid-cols-12 gap-3 sm:gap-4">
+
+    <!-- LEFT PANEL: DETAILS & CHARTS -->
+    <div class="lg:col-span-7 flex flex-col gap-3">
+      
+      <!-- SEARCH BAR: DI ATAS CARD EMITEN -->
+      <div class="bg-[#0f141d] border border-slate-800 rounded-lg p-2.5 flex items-center justify-between gap-2">
+        <div class="flex items-center gap-2 text-xs font-bold text-slate-400 px-1">
+          <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+          </svg>
+          <span class="hidden sm:inline text-[11px] text-slate-300">ANALISA EMITEN:</span>
+        </div>
+        <div class="relative flex-1">
+          <input id="tickerSearchInput" type="text" placeholder="Masukkan kode saham... (cth: BBCA, ASII, AMMN)" 
+                 class="w-full bg-[#141a24] border border-slate-700/80 rounded px-3 py-1.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 tracking-wider font-semibold"
+                 onkeydown="if(event.key==='Enter') searchCustomTicker()" />
+          <button onclick="searchCustomTicker()" class="absolute right-1 top-1 text-[11px] px-3 py-1 bg-emerald-600 hover:bg-emerald-500 text-white rounded font-bold transition flex items-center gap-1">
+            <span>CEK</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Emiten Header & Key Metrics Card -->
+      <div class="bg-[#0f141d] border border-slate-800 rounded-lg p-3 sm:p-4">
+        <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800 pb-2.5">
+          <div class="flex items-baseline gap-2.5">
+            <h2 id="cardTicker" class="text-xl sm:text-2xl font-black tracking-wider text-white">-</h2>
+            <span id="cardPrice" class="text-lg sm:text-xl font-bold text-white">-</span>
+            <span id="cardChg" class="text-xs sm:text-sm font-bold px-1.5 py-0.5 rounded bg-slate-800 text-slate-400">-</span>
+          </div>
+          <div id="cardSignal" class="text-xs font-bold px-2.5 py-1 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
+            ANALYZING...
+          </div>
+        </div>
+
+        <!-- Metrics Grid -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 mt-3 text-xs">
+          
+          <div class="bg-[#141a24] p-2 rounded border border-slate-800/80 flex flex-col justify-between">
+            <div class="flex items-center justify-between">
+              <span class="text-[10px] text-slate-400 font-semibold">VPA VOL RATIO</span>
+              <span class="text-[9px] text-slate-500">Std: ≥2.0x</span>
+            </div>
+            <div class="flex items-baseline justify-between mt-1">
+              <span id="cardVPA" class="text-sm font-bold text-emerald-400">-</span>
+              <span id="cardVPA_Badge" class="text-[9px] px-1 py-0.2 rounded bg-slate-800 text-slate-400">-</span>
+            </div>
+          </div>
+
+          <div class="bg-[#141a24] p-2 rounded border border-slate-800/80 flex flex-col justify-between">
+            <div class="flex items-center justify-between">
+              <span class="text-[10px] text-slate-400 font-semibold">FREQ SPIKE</span>
+              <span class="text-[9px] text-slate-500">Std: ≥2.0x</span>
+            </div>
+            <div class="flex items-baseline justify-between mt-1">
+              <span id="cardFQS" class="text-sm font-bold text-white">-</span>
+              <span id="cardFQS_Badge" class="text-[9px] px-1 py-0.2 rounded bg-slate-800 text-slate-400">-</span>
+            </div>
+          </div>
+
+          <div class="bg-[#141a24] p-2 rounded border border-slate-800/80 flex flex-col justify-between">
+            <div class="flex items-center justify-between">
+              <span class="text-[10px] text-slate-400 font-semibold">RSI (14)</span>
+              <span class="text-[9px] text-slate-500">Std: 45-65</span>
+            </div>
+            <div class="flex items-baseline justify-between mt-1">
+              <span id="cardRSI" class="text-sm font-bold text-white">-</span>
+              <span id="cardRSI_Badge" class="text-[9px] px-1 py-0.2 rounded bg-slate-800 text-slate-400">-</span>
+            </div>
+          </div>
+
+          <div class="bg-[#141a24] p-2 rounded border border-slate-800/80 flex flex-col justify-between">
+            <div class="flex items-center justify-between">
+              <span class="text-[10px] text-slate-400 font-semibold">DEAN SCORE</span>
+              <span class="text-[9px] text-slate-500">Std: ≥1.0e-3</span>
+            </div>
+            <div class="flex items-baseline justify-between mt-1">
+              <span id="cardDean" class="text-sm font-bold text-amber-400">-</span>
+              <span id="cardDean_Badge" class="text-[9px] px-1 py-0.2 rounded bg-slate-800 text-slate-400">-</span>
+            </div>
+          </div>
+
+          <div class="bg-[#141a24] p-2 rounded border border-slate-800/80 flex flex-col justify-between">
+            <div class="flex items-center justify-between">
+              <span class="text-[10px] text-slate-400 font-semibold">SUPPORT (20D)</span>
+              <span class="text-[9px] text-slate-500">Stop Loss Base</span>
+            </div>
+            <div class="flex items-baseline justify-between mt-1">
+              <span id="cardSupport" class="text-sm font-bold text-slate-300">-</span>
+              <span id="cardSupport_Badge" class="text-[9px] px-1 py-0.2 rounded bg-slate-800 text-slate-400">-</span>
+            </div>
+          </div>
+
+          <div class="bg-[#141a24] p-2 rounded border border-slate-800/80 flex flex-col justify-between">
+            <div class="flex items-center justify-between">
+              <span class="text-[10px] text-slate-400 font-semibold">RESISTANCE (20D)</span>
+              <span class="text-[9px] text-slate-500">Take Profit Target</span>
+            </div>
+            <div class="flex items-baseline justify-between mt-1">
+              <span id="cardResistance" class="text-sm font-bold text-slate-300">-</span>
+              <span id="cardResistance_Badge" class="text-[9px] px-1 py-0.2 rounded bg-slate-800 text-slate-400">-</span>
+            </div>
+          </div>
+
+          <div class="bg-[#141a24] p-2 rounded border border-slate-800/80 flex flex-col justify-between">
+            <div class="flex items-center justify-between">
+              <span class="text-[10px] text-slate-400 font-semibold">VOLUME LOT</span>
+              <span class="text-[9px] text-slate-500">Std: ≥50K Lot</span>
+            </div>
+            <div class="flex items-baseline justify-between mt-1">
+              <span id="cardVolLot" class="text-sm font-bold text-slate-300">-</span>
+              <span id="cardVolLot_Badge" class="text-[9px] px-1 py-0.2 rounded bg-slate-800 text-slate-400">-</span>
+            </div>
+          </div>
+
+          <div class="bg-[#141a24] p-2 rounded border border-slate-800/80 flex flex-col justify-between">
+            <div class="flex items-center justify-between">
+              <span class="text-[10px] text-slate-400 font-semibold">TURNOVER</span>
+              <span class="text-[9px] text-slate-500">Std: ≥1.0 Miliar</span>
+            </div>
+            <div class="flex items-baseline justify-between mt-1">
+              <span id="cardTurnover" class="text-sm font-bold text-slate-300">-</span>
+              <span id="cardTurnover_Badge" class="text-[9px] px-1 py-0.2 rounded bg-slate-800 text-slate-400">-</span>
+            </div>
+          </div>
+
+        </div>
+
+        <div id="cardActionNote" class="mt-2.5 text-[11px] text-slate-400 bg-[#121721] px-3 py-1.5 rounded border-l-2 border-emerald-500">
+          -
+        </div>
+      </div>
+
+      <!-- CHART CONTAINER -->
+      <div id="chartSnapshotTarget" class="bg-[#0f141d] border border-slate-800 rounded-lg p-2.5 sm:p-3 flex flex-col">
+        
+        <div class="flex items-center justify-between px-1 pb-1.5 border-b border-slate-800/60 mb-1">
+          <div class="text-[11px] font-bold text-slate-300 flex items-center gap-3">
+            <span>CANDLESTICK + MA20/MA50</span>
+            <span class="text-[10px] text-emerald-400 font-normal">● MA20</span>
+            <span class="text-[10px] text-amber-400 font-normal">● MA50</span>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <span class="text-[10px] text-slate-500 hidden sm:inline">TradingView Lightweight</span>
+            <button id="btnChartSnap" onclick="takeChartSnapshot()" title="Ambil Screenshot & Bagikan" 
+                    class="p-1 rounded bg-[#141a24] hover:bg-slate-800 text-slate-400 hover:text-cyan-400 border border-slate-700/80 hover:border-cyan-500/40 transition flex items-center justify-center">
+              <svg id="snapCameraIcon" class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                      d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <div id="candleChartContainer" class="w-full h-[300px] sm:h-[370px] relative"></div>
+
+        <div class="flex items-center justify-between px-1 pt-2 pb-1 border-t border-slate-800/60 mt-1">
+          <div class="text-[10px] font-bold text-slate-300">MOMENTUM RSI (14)</div>
+          <div class="text-[9px] text-slate-500">OB: 70 | OS: 30</div>
+        </div>
+
+        <div id="rsiChartContainer" class="w-full h-[100px] sm:h-[120px] relative"></div>
+
+      </div>
+
+    </div>
+
+    <!-- RIGHT PANEL: SCREENER RADAR & SPECIAL FLOWS -->
+    <div class="lg:col-span-5 flex flex-col gap-2">
+      <div class="bg-[#0f141d] border border-slate-800 rounded-lg flex flex-col h-full max-h-[860px]">
+        
+        <!-- HEADER RADAR: BARIS 1 (JUDUL & STATUS COUNTER) -->
+        <div class="p-3 border-b border-slate-800/80 flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <span id="radarIndicatorDot" class="w-2.5 h-2.5 rounded-full bg-indigo-400"></span>
+            <h3 id="radarTitle" class="text-xs font-bold text-white tracking-wider uppercase">RADAR LQ45</h3>
+          </div>
+          <div class="text-[11px] text-slate-400 bg-[#141a24] px-2.5 py-0.5 rounded border border-slate-800">
+            Terdeteksi: <span id="radarCount" class="font-bold text-emerald-400">0</span> Saham
+          </div>
+        </div>
+
+        <!-- HEADER RADAR: BARIS 2 (PILIHAN UNIVERSE + RESCAN + STRONG BUY) -->
+        <div class="px-3 py-2 bg-[#0b0e14] border-b border-slate-800 flex flex-wrap items-center justify-between gap-2">
+          
+          <div class="flex items-center gap-1.5 flex-wrap">
+            <div class="flex items-center bg-[#141a24] border border-slate-700/80 rounded p-0.5 text-[11px] font-semibold gap-1">
+              <button id="btnUnivLQ45" onclick="handleUniverseClick('LQ45')" class="px-2.5 py-1 rounded bg-emerald-600 text-white font-bold transition">
+                LQ45
+              </button>
+              <button id="btnUnivKOMPAS" onclick="handleUniverseClick('KOMPAS100')" class="px-2.5 py-1 rounded text-slate-400 hover:text-white flex items-center gap-1 transition">
+                <span>KOMPAS 100</span><span id="lockKompas" class="hidden text-[10px]"></span>
+              </button>
+              <button id="btnUnivAll" onclick="handleUniverseClick('ALL')" class="px-2.5 py-1 rounded text-slate-400 hover:text-white flex items-center gap-1 transition">
+                <span>ALL IHSG</span><span id="lockAll" class="hidden text-[10px]"></span>
+              </button>
+            </div>
+
+            <!-- Tombol RESCAN -->
+            <button id="btnRefreshScan" onclick="triggerRescan()" title="Scan Ulang Pasar (Waktu Server)" 
+                    class="px-2.5 py-1 bg-[#141a24] hover:bg-slate-800 border border-slate-700/80 text-emerald-400 text-[11px] font-bold rounded flex items-center gap-1.5 transition">
+              <svg class="w-3.5 h-3.5" id="refreshIcon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+              </svg>
+              <span id="rescanLabel">RESCAN</span>
+            </button>
+          </div>
+
+          <!-- Tombol STRONG BUY -->
+          <div>
+            <button id="btnStrongBuy" onclick="handleStrongBuyClick()" 
+                    class="px-2.5 py-1 rounded bg-amber-500/10 text-amber-400 border border-amber-500/40 hover:bg-amber-500/20 text-[11px] font-bold flex items-center gap-1 transition">
+              <span>⚡</span>
+              <span>STRONG BUY</span>
+              <span id="lockStrongBuy" class="hidden text-[10px]"></span>
+            </button>
+          </div>
+        </div>
+
+        <!-- HEADER RADAR: BARIS 3 (BERDAMPINGAN: NET FOREIGN + BANDARMOLOGY + VPA METHOD) -->
+        <div class="px-3 py-1.5 bg-[#090d13] border-b border-slate-800 flex flex-wrap items-center justify-between gap-2">
+          
+          <div class="flex items-center gap-1.5 flex-wrap">
+            <button id="btnNetForeignMode" onclick="toggleForeignMode()" 
+                    class="px-2 py-1 rounded bg-sky-500/10 text-sky-400 border border-sky-500/30 hover:bg-sky-500/20 text-[10px] font-bold flex items-center gap-1 transition">
+              <span>NET FOREIGN</span>
+              <span id="lockForeign" class="hidden text-[9px]"></span>
+            </button>
+
+            <button id="btnBandarMode" onclick="toggleBandarMode()" 
+                    class="px-2 py-1 rounded bg-purple-500/10 text-purple-400 border border-purple-500/30 hover:bg-purple-500/20 text-[10px] font-bold flex items-center gap-1 transition">
+              <span>BANDARMOLOGY</span>
+              <span id="lockBandar" class="hidden text-[9px]"></span>
+            </button>
+
+            <button id="btnVPAMode" onclick="toggleVPAMode()" 
+                    class="px-2 py-1 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/20 text-[10px] font-bold flex items-center gap-1 transition">
+              <span>VPA SPIKE</span>
+              <span id="lockVPA" class="hidden text-[9px]"></span>
+            </button>
+          </div>
+
+          <!-- Sub-Tabs Foreign -->
+          <div id="foreignSubTabs" class="hidden flex items-center bg-[#141a24] border border-slate-700/80 rounded p-0.5 text-[10px] font-bold gap-1">
+            <button id="btnForeignBuy" onclick="setForeignSubTab('buy')" class="px-2.5 py-0.5 rounded bg-emerald-600 text-white transition">
+              TOP 20 BUY
+            </button>
+            <button id="btnForeignSell" onclick="setForeignSubTab('sell')" class="px-2.5 py-0.5 rounded text-slate-400 hover:text-rose-400 transition">
+              TOP 20 SELL
+            </button>
+          </div>
+
+          <!-- Sub-Tabs Bandarmology -->
+          <div id="bandarSubTabs" class="hidden flex items-center bg-[#141a24] border border-slate-700/80 rounded p-0.5 text-[10px] font-bold gap-1">
+            <button id="btnBandarAccum" onclick="setBandarSubTab('accum')" class="px-2.5 py-0.5 rounded bg-purple-600 text-white transition">
+              BIG ACCUM
+            </button>
+            <button id="btnBandarDistrib" onclick="setBandarSubTab('distrib')" class="px-2.5 py-0.5 rounded text-slate-400 hover:text-rose-400 transition">
+              BIG DISTRIB
+            </button>
+          </div>
+
+          <!-- Sub-Tabs VPA Method -->
+          <div id="vpaSubTabs" class="hidden flex items-center bg-[#141a24] border border-slate-700/80 rounded p-0.5 text-[10px] font-bold gap-1">
+            <button id="btnVpaHigh" onclick="setVpaSubTab('high')" class="px-2.5 py-0.5 rounded bg-emerald-600 text-white transition">
+              VPA ≥ 2.0x
+            </button>
+            <button id="btnVpaAccum" onclick="setVpaSubTab('accum')" class="px-2.5 py-0.5 rounded text-slate-400 hover:text-emerald-400 transition">
+              ACCUMULATION
+            </button>
+          </div>
+
+        </div>
+
+        <!-- TABEL DATA RADAR / SPECIAL FLOWS -->
+        <div class="overflow-x-auto overflow-y-auto flex-1">
+          <table class="w-full text-left border-collapse text-[11px] whitespace-nowrap select-none">
+            <thead id="tableHeaderArea" class="bg-[#141a24] text-slate-400 uppercase tracking-wider sticky top-0 z-10 text-[10px]"></thead>
+            <tbody id="screenerTableBody" class="divide-y border-slate-800/60 font-medium">
+              <tr>
+                <td colspan="6" class="text-center py-8 text-slate-500">Memuat data...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+    </div>
+
+  </main>
+
+  <!-- MODAL UPGRADE TO PRO -->
+  <div id="upgradeModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-[#0f141d] border border-amber-500/40 rounded-xl max-w-md w-full p-6 flex flex-col gap-4 shadow-2xl">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <div class="flex items-center gap-2">
+          <span class="text-xl">⭐</span>
+          <h3 class="text-sm font-bold text-amber-300 tracking-wider">UPGRADE IDX TERMINAL PRO</h3>
+        </div>
+        <button onclick="closeUpgradeModal()" class="text-slate-400 hover:text-white text-base font-bold">&times;</button>
+      </div>
+
+      <p class="text-xs text-slate-300 leading-relaxed">
+        Fitur <span id="featureBlockedName" class="font-bold text-white">ini</span> eksklusif untuk akun <b>PRO MEMBER</b>.
+      </p>
+
+      <div class="bg-[#141a24] p-3 rounded border border-slate-800 text-xs text-slate-400 space-y-1.5">
+        <div class="text-white font-bold mb-1">Fasilitas Paket PRO:</div>
+        <div>✓ Radar seluruh konstituen aktif IHSG & Kompas100</div>
+        <div>✓ Filter instan ⚡ STRONG BUY Breakout</div>
+        <div>✓ Fitur Top 20 Net Foreign Flow Akumulasi & Distribusi</div>
+        <div>✓ Fitur Analisa Bandarmology Kuantitatif (Big Accum/Distrib)</div>
+        <div>✓ Scanner Volume Price Analysis (VPA Spike Method)</div>
+        <div>✓ Unlimited Rescan tanpa batasan 3x harian</div>
+        <div>✓ Masa aktif: <b>30 Hari Penuh</b></div>
+      </div>
+
+      <div class="bg-black/50 p-3 rounded border border-emerald-500/30 flex items-center justify-between">
+        <div>
+          <span class="text-[10px] text-slate-400 block">Biaya Berlangganan:</span>
+          <span class="text-base font-black text-emerald-400">Rp 1.000</span>
+          <span class="text-[10px] text-slate-500"> / Uji Coba 30 Hari</span>
+        </div>
+        <div class="text-right">
+          <span class="text-[9px] px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 font-bold border border-emerald-500/20">
+            AUTO-AKTIF QRIS
+          </span>
+        </div>
+      </div>
+
+      <div class="flex items-center justify-end gap-2 pt-2 border-t border-slate-800 mt-2">
+        <button onclick="closeUpgradeModal()" class="px-3 py-2 rounded bg-slate-800 text-slate-300 hover:bg-slate-700 text-xs font-semibold">
+          Nanti Saja
+        </button>
+        <button id="btnPayMidtrans" onclick="payWithMidtrans()" class="px-4 py-2 rounded bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-black text-xs font-extrabold flex items-center gap-1.5 shadow-lg shadow-emerald-950 transition">
+          <span>⚡</span>
+          <span>Bayar Otomatis (QRIS)</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <footer class="text-center py-2 text-[10px] text-slate-500 border-t border-slate-800 bg-[#0c1017]">
+    IDX Confluence Terminal • Real-Time Market Intelligence
+  </footer>
+
+  <!-- SCRIPT ENGINE -->
+  <script>
+    let userRole = 'free';
+    let userProExpiresAt = null;
+    let currentFilter = 'LQ45';
+    let rawScreenerData = [];
+    let scanQuotaRemaining = 3;
+    
+    // State Mode Khusus (Foreign | Bandar | VPA)
+    let activeSpecialMode = null;
+
+    // Foreign Flow State
+    let foreignSubTab = 'buy'; 
+    let foreignDataBuy = [];
+    let foreignDataSell = [];
+
+    // Bandarmology State
+    let bandarSubTab = 'accum';
+    let bandarDataAccum = [];
+    let bandarDataDistrib = [];
+
+    // VPA Method State
+    let vpaSubTab = 'high';
+
+    let sortColumn = 'score'; 
+    let sortDirection = 'desc'; 
+
+    let candleChart = null;
+    let rsiChart = null;
+    let candleSeries = null;
+    let volumeSeries = null;
+    let ma20Line = null;
+    let ma50Line = null;
+    let volMa20Line = null;
+    let rsiLine = null;
+    let isSyncing = false;
+
+    function syncPriceScaleWidths() {
+      if (!candleChart || !rsiChart) return;
+      try {
+        const wCandle = candleChart.priceScale('right').width();
+        const wRsi = rsiChart.priceScale('right').width();
+        const maxW = Math.max(wCandle, wRsi, 75);
+        candleChart.applyOptions({ rightPriceScale: { minimumWidth: maxW } });
+        rsiChart.applyOptions({ rightPriceScale: { minimumWidth: maxW } });
+      } catch (e) {}
+    }
+
+    function initCharts() {
+      const candleBox = document.getElementById('candleChartContainer');
+      const rsiBox = document.getElementById('rsiChartContainer');
+
+      const commonOptions = {
+        layout: {
+          background: { color: '#0f141d' },
+          textColor: '#94a3b8',
+          fontSize: 10,
+          fontFamily: 'JetBrains Mono'
+        },
+        grid: {
+          vertLines: { color: '#161e2b' },
+          horzLines: { color: '#161e2b' }
+        },
+        crosshair: { 
+          mode: LightweightCharts.CrosshairMode.Normal,
+          vertLine: {
+            color: '#94a3b8',
+            width: 1,
+            style: LightweightCharts.LineStyle.Dashed,
+            labelBackgroundColor: '#1e293b'
+          }
+        },
+        rightPriceScale: {
+          borderColor: '#1e293b',
+          autoScale: true,
+          scaleMargins: { top: 0.12, bottom: 0.15 }
+        },
+        leftPriceScale: { visible: false }
+      };
+
+      candleChart = LightweightCharts.createChart(candleBox, {
+        ...commonOptions,
+        timeScale: { 
+          borderColor: '#1e293b', 
+          timeVisible: true,
+          rightOffset: 6,
+          fixLeftEdge: true,
+          shiftVisibleRangeOnNewBar: false
+        }
+      });
+
+      candleSeries = candleChart.addCandlestickSeries({
+        upColor: '#10b981',
+        downColor: '#f43f5e',
+        borderVisible: false,
+        wickUpColor: '#10b981',
+        wickDownColor: '#f43f5e'
+      });
+
+      volumeSeries = candleChart.addHistogramSeries({
+        priceFormat: { type: 'volume' },
+        priceScaleId: '',
+        scaleMargins: { top: 0.75, bottom: 0 }
+      });
+
+      volMa20Line = candleChart.addLineSeries({
+        color: '#38bdf8',
+        lineWidth: 1,
+        priceScaleId: '',
+        scaleMargins: { top: 0.75, bottom: 0 }
+      });
+
+      ma20Line = candleChart.addLineSeries({ color: '#34d399', lineWidth: 1.5 });
+      ma50Line = candleChart.addLineSeries({ color: '#fbbf24', lineWidth: 1.5 });
+
+      rsiChart = LightweightCharts.createChart(rsiBox, {
+        ...commonOptions,
+        timeScale: { 
+          borderColor: '#1e293b', 
+          visible: false,
+          rightOffset: 6,
+          fixLeftEdge: true,
+          shiftVisibleRangeOnNewBar: false
+        }
+      });
+
+      rsiLine = rsiChart.addLineSeries({ 
+        color: '#c084fc', 
+        lineWidth: 1.5,
+        priceFormat: {
+          type: 'custom',
+          formatter: price => Number(price).toFixed(2)
+        }
+      });
+
+      rsiLine.createPriceLine({ price: 70, color: 'rgba(244, 63, 94, 0.4)', lineWidth: 1, lineStyle: LightweightCharts.LineStyle.Dashed, axisLabelVisible: true, title: 'OB 70' });
+      rsiLine.createPriceLine({ price: 30, color: 'rgba(16, 185, 129, 0.4)', lineWidth: 1, lineStyle: LightweightCharts.LineStyle.Dashed, axisLabelVisible: true, title: 'OS 30' });
+
+      candleChart.timeScale().subscribeVisibleLogicalRangeChange(range => {
+        if (isSyncing || !range) return;
+        isSyncing = true;
+        rsiChart.timeScale().setVisibleLogicalRange(range);
+        isSyncing = false;
+      });
+
+      rsiChart.timeScale().subscribeVisibleLogicalRangeChange(range => {
+        if (isSyncing || !range) return;
+        isSyncing = true;
+        candleChart.timeScale().setVisibleLogicalRange(range);
+        isSyncing = false;
+      });
+
+      candleChart.subscribeCrosshairMove(param => {
+        if (!param.point || !param.time) {
+          rsiChart.clearCrosshairPosition();
+          return;
+        }
+        rsiChart.setCrosshairPosition(0, param.time, rsiLine);
+      });
+
+      rsiChart.subscribeCrosshairMove(param => {
+        if (!param.point || !param.time) {
+          candleChart.clearCrosshairPosition();
+          return;
+        }
+        candleChart.setCrosshairPosition(0, param.time, candleSeries);
+      });
+
+      const resizeCharts = () => {
+        if (candleBox && candleChart) {
+          candleChart.applyOptions({ width: candleBox.clientWidth, height: candleBox.clientHeight });
+        }
+        if (rsiBox && rsiChart) {
+          rsiChart.applyOptions({ width: rsiBox.clientWidth, height: rsiBox.clientHeight });
+        }
+        setTimeout(syncPriceScaleWidths, 50);
+      };
+
+      window.addEventListener('resize', resizeCharts);
+      new ResizeObserver(resizeCharts).observe(candleBox);
+    }
+
+    async function takeChartSnapshot() {
+      const chartTarget = document.getElementById('chartSnapshotTarget');
+      const btn = document.getElementById('btnChartSnap');
+      const icon = document.getElementById('snapCameraIcon');
+      const ticker = document.getElementById('cardTicker').innerText.trim() || 'IDX';
+
+      try {
+        btn.style.visibility = 'hidden';
+        icon.classList.add('animate-pulse');
+
+        const canvas = await html2canvas(chartTarget, {
+          backgroundColor: '#0f141d',
+          scale: 2,
+          useCORS: true
+        });
+
+        canvas.toBlob(async (blob) => {
+          const fileName = `Chart_${ticker}_${new Date().toISOString().slice(0, 10)}.png`;
+          const file = new File([blob], fileName, { type: 'image/png' });
+
+          if (navigator.canShare && navigator.canShare({ files: [file] })) {
+            try {
+              await navigator.share({
+                files: [file],
+                title: `Chart Saham ${ticker}`,
+                text: `Analisa Chart Candlestick & Indikator: ${ticker}`
+              });
+            } catch (err) {
+              fallbackDownload(canvas, fileName);
+            }
+          } else {
+            fallbackDownload(canvas, fileName);
+          }
+
+          btn.style.visibility = 'visible';
+          icon.classList.remove('animate-pulse');
+        }, 'image/png');
+
+      } catch (e) {
+        btn.style.visibility = 'visible';
+        icon.classList.remove('animate-pulse');
+      }
+    }
+
+    function fallbackDownload(canvas, fileName) {
+      const link = document.createElement('a');
+      link.download = fileName;
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    }
+
+    function formatTimeRemaining(expireMs) {
+      if (!expireMs) return '';
+      const diff = Number(expireMs) - Date.now();
+      if (diff <= 0) return 'Habis';
+      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      if (days > 0) return `${days}h ${hours}j`;
+      return `${hours} jam lagi`;
+    }
+
+    async function loadCurrentUser() {
+      try {
+        const res = await fetch('/api/auth/me');
+        const data = await res.json();
+        if (data.status === 'success') {
+          userRole = data.user.role || 'free';
+          userProExpiresAt = data.user.proExpiresAt;
+          scanQuotaRemaining = data.user.scanQuotaRemaining ?? 3;
+
+          document.getElementById('userNameBadgeMobile').innerText = data.user.name;
+          document.getElementById('userNameBadgeDesktop').innerText = data.user.name;
+
+          const roleBadge = document.getElementById('headerRoleBadge');
+          const btnTopUpgrade = document.getElementById('btnTopUpgrade');
+
+          if (userRole === 'owner') {
+            roleBadge.innerText = 'OWNER';
+            roleBadge.className = 'text-[10px] px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30 font-bold';
+            btnTopUpgrade.classList.add('hidden');
+            
+            if (!document.getElementById("btnOwnerAdmin")) {
+              const btn = document.createElement("a");
+              btn.id = "btnOwnerAdmin";
+              btn.href = "/admin";
+              btn.innerText = "⚙ OWNER PANEL";
+              btn.className = "text-xs px-2.5 py-1 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40 hover:bg-amber-500/30 font-bold transition mr-2";
+              document.getElementById("userNameBadgeDesktop").parentNode.prepend(btn);
+              
+              const btnMob = btn.cloneNode(true);
+              btnMob.innerText = "⚙ PANEL";
+              document.getElementById("userNameBadgeMobile").parentNode.prepend(btnMob);
+            }
+          } else if (userRole === 'pro') {
+            const countdownText = formatTimeRemaining(userProExpiresAt);
+            roleBadge.innerHTML = `PRO MEMBER <span class="text-amber-300 font-mono text-[9px] ml-1 bg-amber-500/20 px-1 py-0.2 rounded">⌛ ${countdownText}</span>`;
+            roleBadge.className = 'text-[10px] px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 font-bold flex items-center';
+            btnTopUpgrade.classList.add('hidden');
+          } else {
+            roleBadge.innerText = 'FREE TIER';
+            roleBadge.className = 'text-[10px] px-2 py-0.5 rounded bg-slate-800 text-slate-400 border border-slate-700 font-bold';
+            btnTopUpgrade.classList.remove('hidden');
+          }
+
+          applyRoleRestrictionsUI();
+          updateRescanButtonUI();
+        }
+      } catch (e) {}
+    }
+
+    function applyRoleRestrictionsUI() {
+      const lockAll = document.getElementById('lockAll');
+      const lockKompas = document.getElementById('lockKompas');
+      const lockStrongBuy = document.getElementById('lockStrongBuy');
+      const lockForeign = document.getElementById('lockForeign');
+      const lockBandar = document.getElementById('lockBandar');
+      const lockVPA = document.getElementById('lockVPA');
+
+      if (userRole === 'free') {
+        lockAll.classList.remove('hidden');
+        lockKompas.classList.remove('hidden');
+        lockStrongBuy.classList.remove('hidden');
+        lockForeign.classList.remove('hidden');
+        lockBandar.classList.remove('hidden');
+        lockVPA.classList.remove('hidden');
+      } else {
+        lockAll.classList.add('hidden');
+        lockKompas.classList.add('hidden');
+        lockStrongBuy.classList.add('hidden');
+        lockForeign.classList.add('hidden');
+        lockBandar.classList.add('hidden');
+        lockVPA.classList.add('hidden');
+      }
+    }
+
+    function updateRescanButtonUI() {
+      const lbl = document.getElementById('rescanLabel');
+      if (userRole === 'free') {
+        lbl.innerText = `RESCAN (${scanQuotaRemaining}/3)`;
+      } else {
+        lbl.innerText = 'RESCAN';
+      }
+    }
+
+    function openUpgradeModal(featureName) {
+      document.getElementById('featureBlockedName').innerText = featureName;
+      document.getElementById('upgradeModal').classList.remove('hidden');
+    }
+
+    function closeUpgradeModal() {
+      document.getElementById('upgradeModal').classList.add('hidden');
+    }
+
+    async function payWithMidtrans() {
+      const btn = document.getElementById('btnPayMidtrans');
+      const originalText = btn.innerHTML;
+      btn.innerHTML = '<span>Memuat QRIS...</span>';
+      btn.disabled = true;
+
+      try {
+        const res = await fetch('/api/payment/create-snap', { method: 'POST' });
+        const data = await res.json();
+
+        if (data.status === 'success' && data.token) {
+          window.snap.pay(data.token, {
+            onSuccess: function(result) {
+              alert('Pembayaran Sukses! Akun Anda aktif sebagai PRO MEMBER 30 Hari.');
+              closeUpgradeModal();
+              loadCurrentUser().then(() => fetchScreenerData(false));
+            },
+            onPending: function(result) {
+              alert('Menunggu pembayaran QRIS diselesaikan.');
+            },
+            onError: function(result) {
+              alert('Pembayaran gagal atau dibatalkan.');
+            },
+            onClose: function() {
+              btn.innerHTML = originalText;
+              btn.disabled = false;
+            }
+          });
+        } else {
+          alert('Gagal membuat tagihan: ' + (data.message || 'Cek kredensial Midtrans'));
+        }
+      } catch (err) {
+        alert('Gagal menghubungi server pembayaran.');
+      } finally {
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+      }
+    }
+
+    // ==========================================
+    // LOGIKA NET FOREIGN FLOW MODE
+    // ==========================================
+    function toggleForeignMode() {
+      if (userRole === 'free') {
+        openUpgradeModal('Fitur Top 20 Net Foreign Flow');
+        return;
+      }
+
+      if (activeSpecialMode === 'foreign') {
+        resetSpecialModes();
+        renderTable();
+      } else {
+        resetSpecialModes();
+        activeSpecialMode = 'foreign';
+        const btn = document.getElementById('btnNetForeignMode');
+        btn.className = 'px-2 py-1 rounded bg-sky-500 text-black border border-sky-400 font-black text-[10px] flex items-center gap-1 transition shadow-lg shadow-sky-950';
+        document.getElementById('foreignSubTabs').classList.remove('hidden');
+        loadForeignData();
+      }
+    }
+
+    function setForeignSubTab(tab) {
+      foreignSubTab = tab;
+      const bBuy = document.getElementById('btnForeignBuy');
+      const bSell = document.getElementById('btnForeignSell');
+
+      if (tab === 'buy') {
+        bBuy.className = 'px-2.5 py-0.5 rounded bg-emerald-600 text-white font-bold transition';
+        bSell.className = 'px-2.5 py-0.5 rounded text-slate-400 hover:text-rose-400 transition';
+      } else {
+        bBuy.className = 'px-2.5 py-0.5 rounded text-slate-400 hover:text-emerald-400 transition';
+        bSell.className = 'px-2.5 py-0.5 rounded bg-rose-600 text-white font-bold transition';
+      }
+      renderForeignTable();
+    }
+
+    async function loadForeignData() {
+      const tbody = document.getElementById('screenerTableBody');
+      tbody.innerHTML = '<tr><td colspan="5" class="text-center py-8 text-sky-400 animate-pulse">Memuat Top 20 Net Foreign Flow...</td></tr>';
+
+      try {
+        const res = await fetch('/api/foreign-flow');
+        const data = await res.json();
+        if (data.status === 'success') {
+          foreignDataBuy = data.topBuy || [];
+          foreignDataSell = data.topSell || [];
+          renderForeignTable();
+        } else {
+          tbody.innerHTML = '<tr><td colspan="5" class="text-center py-8 text-slate-500">Gagal mengambil data foreign flow.</td></tr>';
+        }
+      } catch (err) {
+        tbody.innerHTML = '<tr><td colspan="5" class="text-center py-8 text-rose-500">Error menghubungi server foreign flow.</td></tr>';
+      }
+    }
+
+    function renderForeignTable() {
+      const thead = document.getElementById('tableHeaderArea');
+      const tbody = document.getElementById('screenerTableBody');
+      const countLabel = document.getElementById('radarCount');
+      const dot = document.getElementById('radarIndicatorDot');
+      const title = document.getElementById('radarTitle');
+
+      thead.innerHTML = `
+        <tr>
+          <th class="py-2.5 px-3 font-semibold">TICKER</th>
+          <th class="py-2.5 px-2 font-semibold text-right">HARGA</th>
+          <th class="py-2.5 px-2 font-semibold text-right">CHG</th>
+          <th class="py-2.5 px-2 font-semibold text-right">NET FOREIGN</th>
+          <th class="py-2.5 px-3 font-semibold text-right">TURNOVER</th>
+        </tr>
+      `;
+
+      const currentList = foreignSubTab === 'buy' ? foreignDataBuy : foreignDataSell;
+      dot.className = foreignSubTab === 'buy' ? 'w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse' : 'w-2.5 h-2.5 rounded-full bg-rose-400 animate-pulse';
+      title.innerText = foreignSubTab === 'buy' ? 'TOP 20 NET FOREIGN BUY' : 'TOP 20 NET FOREIGN SELL';
+      countLabel.innerText = currentList.length;
+      tbody.innerHTML = '';
+
+      if (currentList.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" class="text-center py-8 text-slate-500">Tidak ada data transaksi foreign flow.</td></tr>`;
+        return;
+      }
+
+      currentList.forEach(item => {
+        const tr = document.createElement('tr');
+        tr.className = 'hover:bg-[#161d28] cursor-pointer transition border-b border-slate-800/40';
+        tr.onclick = () => loadTickerDetails(item.ticker);
+
+        const chgColor = item.up ? 'text-emerald-400' : 'text-rose-400';
+        const flowColor = foreignSubTab === 'buy' ? 'text-emerald-400' : 'text-rose-400';
+
+        tr.innerHTML = `
+          <td class="py-2.5 px-3 font-bold text-white flex items-center gap-1.5">
+            <span>${item.ticker}</span>
+            <span class="text-[9px] px-1 bg-sky-500/20 text-sky-400 rounded">FLOW</span>
+          </td>
+          <td class="py-2.5 px-2 text-right text-slate-200">${item.price.toLocaleString('id-ID')}</td>
+          <td class="py-2.5 px-2 text-right font-bold ${chgColor}">${item.chg}</td>
+          <td class="py-2.5 px-2 text-right font-black ${flowColor}">${item.netForeignText}</td>
+          <td class="py-2.5 px-3 text-right text-slate-400">${item.turnover}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      if (currentList[0]) {
+        loadTickerDetails(currentList[0].ticker);
+      }
+    }
+
+    // ==========================================
+    // LOGIKA BANDARMOLOGY MODE
+    // ==========================================
+    function toggleBandarMode() {
+      if (userRole === 'free') {
+        openUpgradeModal('Fitur Analisa Bandarmology');
+        return;
+      }
+
+      if (activeSpecialMode === 'bandar') {
+        resetSpecialModes();
+        renderTable();
+      } else {
+        resetSpecialModes();
+        activeSpecialMode = 'bandar';
+        const btn = document.getElementById('btnBandarMode');
+        btn.className = 'px-2 py-1 rounded bg-purple-500 text-black border border-purple-400 font-black text-[10px] flex items-center gap-1 transition shadow-lg shadow-purple-950';
+        document.getElementById('bandarSubTabs').classList.remove('hidden');
+        loadBandarData();
+      }
+    }
+
+    function setBandarSubTab(tab) {
+      bandarSubTab = tab;
+      const bAccum = document.getElementById('btnBandarAccum');
+      const bDistrib = document.getElementById('btnBandarDistrib');
+
+      if (tab === 'accum') {
+        bAccum.className = 'px-2.5 py-0.5 rounded bg-purple-600 text-white font-bold transition';
+        bDistrib.className = 'px-2.5 py-0.5 rounded text-slate-400 hover:text-rose-400 transition';
+      } else {
+        bAccum.className = 'px-2.5 py-0.5 rounded text-slate-400 hover:text-purple-400 transition';
+        bDistrib.className = 'px-2.5 py-0.5 rounded bg-rose-600 text-white font-bold transition';
+      }
+      renderBandarTable();
+    }
+
+    async function loadBandarData() {
+      const tbody = document.getElementById('screenerTableBody');
+      tbody.innerHTML = '<tr><td colspan="5" class="text-center py-8 text-purple-400 animate-pulse">Menganalisa Bandarmology Kuantitatif...</td></tr>';
+
+      try {
+        const res = await fetch('/api/bandarmology');
+        const data = await res.json();
+        if (data.status === 'success') {
+          bandarDataAccum = data.topAccum || [];
+          bandarDataDistrib = data.topDistrib || [];
+          renderBandarTable();
+        } else {
+          tbody.innerHTML = '<tr><td colspan="5" class="text-center py-8 text-slate-500">Gagal mengambil data bandarmology.</td></tr>';
+        }
+      } catch (err) {
+        tbody.innerHTML = '<tr><td colspan="5" class="text-center py-8 text-rose-500">Error menghubungi server bandarmology.</td></tr>';
+      }
+    }
+
+    function renderBandarTable() {
+      const thead = document.getElementById('tableHeaderArea');
+      const tbody = document.getElementById('screenerTableBody');
+      const countLabel = document.getElementById('radarCount');
+      const dot = document.getElementById('radarIndicatorDot');
+      const title = document.getElementById('radarTitle');
+
+      thead.innerHTML = `
+        <tr>
+          <th class="py-2.5 px-3 font-semibold">TICKER</th>
+          <th class="py-2.5 px-2 font-semibold text-right">HARGA</th>
+          <th class="py-2.5 px-2 font-semibold text-right">CHG</th>
+          <th class="py-2.5 px-2 font-semibold text-center">AKUM / DIST</th>
+          <th class="py-2.5 px-3 font-semibold text-right">POWER SCORE</th>
+        </tr>
+      `;
+
+      const currentList = bandarSubTab === 'accum' ? bandarDataAccum : bandarDataDistrib;
+      dot.className = bandarSubTab === 'accum' ? 'w-2.5 h-2.5 rounded-full bg-purple-400 animate-pulse' : 'w-2.5 h-2.5 rounded-full bg-rose-400 animate-pulse';
+      title.innerText = bandarSubTab === 'accum' ? 'BANDARMOLOGY BIG ACCUMULATION' : 'BANDARMOLOGY BIG DISTRIBUTION';
+      countLabel.innerText = currentList.length;
+      tbody.innerHTML = '';
+
+      if (currentList.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" class="text-center py-8 text-slate-500">Tidak ada emiten dengan anomali bandar saat ini.</td></tr>`;
+        return;
+      }
+
+      currentList.forEach(item => {
+        const tr = document.createElement('tr');
+        tr.className = 'hover:bg-[#161d28] cursor-pointer transition border-b border-slate-800/40';
+        tr.onclick = () => loadTickerDetails(item.ticker);
+
+        const chgColor = item.up ? 'text-emerald-400' : 'text-rose-400';
+        const isBig = item.bandarStatus.includes('BIG');
+        const badgeColor = item.bandarStatus.includes('ACCUM') 
+          ? (isBig ? 'bg-purple-500/20 text-purple-300 border-purple-500/40' : 'bg-emerald-500/20 text-emerald-400 border-emerald-500/40')
+          : 'bg-rose-500/20 text-rose-400 border-rose-500/40';
+
+        tr.innerHTML = `
+          <td class="py-2.5 px-3 font-bold text-white flex items-center gap-1.5">
+            <span>${item.ticker}</span>
+            <span class="text-[9px] px-1 bg-purple-500/20 text-purple-300 rounded font-bold">BD</span>
+          </td>
+          <td class="py-2.5 px-2 text-right text-slate-200">${item.price.toLocaleString('id-ID')}</td>
+          <td class="py-2.5 px-2 text-right font-bold ${chgColor}">${item.chg}</td>
+          <td class="py-2.5 px-2 text-center">
+            <span class="text-[10px] px-2 py-0.5 rounded font-black border ${badgeColor}">
+              ${item.bandarStatus}
+            </span>
+          </td>
+          <td class="py-2.5 px-3 text-right font-black text-purple-300">${item.bandarPower}/100</td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      if (currentList[0]) {
+        loadTickerDetails(currentList[0].ticker);
+      }
+    }
+
+    // ==========================================
+    // LOGIKA VPA METHOD MODE
+    // ==========================================
+    function toggleVPAMode() {
+      if (userRole === 'free') {
+        openUpgradeModal('Fitur Volume Price Analysis (VPA)');
+        return;
+      }
+
+      if (activeSpecialMode === 'vpa') {
+        resetSpecialModes();
+        renderTable();
+      } else {
+        resetSpecialModes();
+        activeSpecialMode = 'vpa';
+        const btn = document.getElementById('btnVPAMode');
+        btn.className = 'px-2 py-1 rounded bg-emerald-500 text-black border border-emerald-400 font-black text-[10px] flex items-center gap-1 transition shadow-lg shadow-emerald-950';
+        document.getElementById('vpaSubTabs').classList.remove('hidden');
+        renderVPATable();
+      }
+    }
+
+    function setVpaSubTab(tab) {
+      vpaSubTab = tab;
+      const bHigh = document.getElementById('btnVpaHigh');
+      const bAccum = document.getElementById('btnVpaAccum');
+
+      if (tab === 'high') {
+        bHigh.className = 'px-2.5 py-0.5 rounded bg-emerald-600 text-white font-bold transition';
+        bAccum.className = 'px-2.5 py-0.5 rounded text-slate-400 hover:text-emerald-400 transition';
+      } else {
+        bHigh.className = 'px-2.5 py-0.5 rounded text-slate-400 hover:text-emerald-400 transition';
+        bAccum.className = 'px-2.5 py-0.5 rounded bg-emerald-600 text-white font-bold transition';
+      }
+      renderVPATable();
+    }
+
+    function renderVPATable() {
+      const thead = document.getElementById('tableHeaderArea');
+      const tbody = document.getElementById('screenerTableBody');
+      const countLabel = document.getElementById('radarCount');
+      const dot = document.getElementById('radarIndicatorDot');
+      const title = document.getElementById('radarTitle');
+
+      thead.innerHTML = `
+        <tr>
+          <th class="py-2.5 px-3 font-semibold">TICKER</th>
+          <th class="py-2.5 px-2 font-semibold text-right">HARGA</th>
+          <th class="py-2.5 px-2 font-semibold text-right">CHG</th>
+          <th class="py-2.5 px-2 font-semibold text-right">VPA RATIO</th>
+          <th class="py-2.5 px-3 font-semibold text-right">VPA PATTERN</th>
+        </tr>
+      `;
+
+      let list = [...rawScreenerData];
+
+      if (vpaSubTab === 'high') {
+        list = list.filter(x => parseFloat(x.vpa) >= 2.0);
+        title.innerText = 'VPA SPIKE (VOLUME RATIO ≥ 2.0x)';
+      } else {
+        list = list.filter(x => parseFloat(x.vpa) >= 1.2 && x.up);
+        title.innerText = 'VPA BULLISH ACCUMULATION';
+      }
+
+      list.sort((a, b) => parseFloat(b.vpa) - parseFloat(a.vpa));
+
+      dot.className = 'w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse';
+      countLabel.innerText = list.length;
+      tbody.innerHTML = '';
+
+      if (list.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" class="text-center py-8 text-slate-500">Tidak ada emiten dengan kriteria VPA saat ini.</td></tr>`;
+        return;
+      }
+
+      list.forEach(item => {
+        const tr = document.createElement('tr');
+        tr.className = 'hover:bg-[#161d28] cursor-pointer transition border-b border-slate-800/40';
+        tr.onclick = () => loadTickerDetails(item.ticker);
+
+        const chgColor = item.up ? 'text-emerald-400' : 'text-rose-400';
+        const vpaVal = parseFloat(item.vpa) || 0;
+        
+        let pattern = 'Effort to Rise';
+        let patClass = 'text-emerald-400';
+        if (vpaVal >= 3.0 && item.up) {
+          pattern = 'Absorption Breakout';
+          patClass = 'text-amber-400 font-black';
+        } else if (!item.up && vpaVal >= 2.0) {
+          pattern = 'High Volume Sell';
+          patClass = 'text-rose-400';
+        }
+
+        tr.innerHTML = `
+          <td class="py-2.5 px-3 font-bold text-white flex items-center gap-1.5">
+            <span>${item.ticker}</span>
+            <span class="text-[9px] px-1 bg-emerald-500/20 text-emerald-400 rounded font-bold">VPA</span>
+          </td>
+          <td class="py-2.5 px-2 text-right text-slate-200">${item.price.toLocaleString('id-ID')}</td>
+          <td class="py-2.5 px-2 text-right font-bold ${chgColor}">${item.chg}</td>
+          <td class="py-2.5 px-2 text-right font-black text-emerald-400">${item.vpa}</td>
+          <td class="py-2.5 px-3 text-right text-[10px] font-semibold ${patClass}">${pattern}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      if (list[0]) {
+        loadTickerDetails(list[0].ticker);
+      }
+    }
+
+    function resetSpecialModes() {
+      activeSpecialMode = null;
+      document.getElementById('btnNetForeignMode').className = 'px-2 py-1 rounded bg-sky-500/10 text-sky-400 border border-sky-500/30 hover:bg-sky-500/20 text-[10px] font-bold flex items-center gap-1 transition';
+      document.getElementById('btnBandarMode').className = 'px-2 py-1 rounded bg-purple-500/10 text-purple-400 border border-purple-500/30 hover:bg-purple-500/20 text-[10px] font-bold flex items-center gap-1 transition';
+      document.getElementById('btnVPAMode').className = 'px-2 py-1 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/20 text-[10px] font-bold flex items-center gap-1 transition';
+      
+      document.getElementById('foreignSubTabs').classList.add('hidden');
+      document.getElementById('bandarSubTabs').classList.add('hidden');
+      document.getElementById('vpaSubTabs').classList.add('hidden');
+    }
+
+    function handleUniverseClick(targetUniv) {
+      resetSpecialModes();
+
+      if (userRole === 'free' && targetUniv !== 'LQ45') {
+        openUpgradeModal(targetUniv === 'ALL' ? 'Radar Seluruh Saham IHSG' : 'Radar Indeks Kompas100');
+        return;
+      }
+      setFilter(targetUniv);
+    }
+
+    function handleStrongBuyClick() {
+      resetSpecialModes();
+
+      if (userRole === 'free') {
+        openUpgradeModal('Filter ⚡ STRONG BUY Breakout');
+        return;
+      }
+      setFilter('STRONGBUY');
+    }
+
+    function calculateConfluenceScore(item) {
+      const vpa = parseFloat(item.vpa) || 0;
+      const freq = parseFloat(item.fqs) || 0;
+      const chg = parseFloat(String(item.chg).replace('%', '').replace('+', '')) || 0;
+      const sig = (item.signal || '').toUpperCase();
+      
+      let bonus = 0;
+      if (sig.includes('STRONG BUY')) bonus += 15;
+      else if (sig.includes('BUY') || sig.includes('ACCUMULATION')) bonus += 8;
+      else if (sig.includes('REBOUND')) bonus += 4;
+      
+      return (vpa * 0.45) + (freq * 0.40) + (chg * 0.15) + bonus;
+    }
+
+    async function fetchScreenerData(force = false) {
+      const tbody = document.getElementById('screenerTableBody');
+
+      try {
+        const res = await fetch(`/api/screener?force=${force}`);
+        const result = await res.json();
+
+        if (res.status === 429) {
+          openUpgradeModal('Batas Kuota Rescan Habis');
+          scanQuotaRemaining = 0;
+          updateRescanButtonUI();
+          return;
+        }
+
+        if (result.status === 'success') {
+          if (typeof result.scanQuotaRemaining === 'number') {
+            scanQuotaRemaining = result.scanQuotaRemaining;
+            updateRescanButtonUI();
+          }
+
+          rawScreenerData = (result.data || []).map(item => ({
+            ...item,
+            calcScore: calculateConfluenceScore(item)
+          }));
+
+          if (!activeSpecialMode) {
+            renderTable();
+          } else if (activeSpecialMode === 'vpa') {
+            renderVPATable();
+          }
+        } else {
+          tbody.innerHTML = '<tr><td colspan="6" class="text-center py-8 text-slate-500">Tidak ada data emiten.</td></tr>';
+        }
+      } catch (err) {
+        tbody.innerHTML = '<tr><td colspan="6" class="text-center py-8 text-rose-500">Gagal mengambil data radar pasar.</td></tr>';
+      }
+    }
+
+    function toggleSort(col) {
+      if (activeSpecialMode) return;
+      if (sortColumn === col) {
+        sortDirection = sortDirection === 'asc' ? 'desc' : 'asc';
+      } else {
+        sortColumn = col;
+        sortDirection = (col === 'ticker') ? 'asc' : 'desc';
+      }
+      renderTable();
+    }
+
+    function updateSortIcons() {
+      const cols = ['ticker', 'price', 'chg', 'vpa', 'freq', 'signal'];
+      cols.forEach(c => {
+        const el = document.getElementById(`sort_${c}`);
+        if (!el) return;
+        if (sortColumn === c) {
+          el.innerText = sortDirection === 'asc' ? '▲' : '▼';
+          el.className = 'text-emerald-400 font-bold';
+        } else {
+          el.innerText = '↕';
+          el.className = 'text-slate-600';
+        }
+      });
+    }
+
+    function renderTable() {
+      const thead = document.getElementById('tableHeaderArea');
+      const tbody = document.getElementById('screenerTableBody');
+      const countLabel = document.getElementById('radarCount');
+      const dot = document.getElementById('radarIndicatorDot');
+      const title = document.getElementById('radarTitle');
+
+      thead.innerHTML = `
+        <tr>
+          <th onclick="toggleSort('ticker')" class="py-2.5 px-3 font-semibold cursor-pointer hover:text-white transition">
+            TICKER <span id="sort_ticker" class="text-slate-600">↕</span>
+          </th>
+          <th onclick="toggleSort('price')" class="py-2.5 px-2 font-semibold text-right cursor-pointer hover:text-white transition">
+            HARGA <span id="sort_price" class="text-slate-600">↕</span>
+          </th>
+          <th onclick="toggleSort('chg')" class="py-2.5 px-2 font-semibold text-right cursor-pointer hover:text-white transition">
+            CHG <span id="sort_chg" class="text-slate-600">↕</span>
+          </th>
+          <th onclick="toggleSort('vpa')" class="py-2.5 px-2 font-semibold text-right cursor-pointer hover:text-white transition">
+            VPA <span id="sort_vpa" class="text-slate-600">↕</span>
+          </th>
+          <th onclick="toggleSort('freq')" class="py-2.5 px-2 font-semibold text-right cursor-pointer hover:text-white transition">
+            FREQ <span id="sort_freq" class="text-slate-600">↕</span>
+          </th>
+          <th onclick="toggleSort('signal')" class="py-2.5 px-3 font-semibold cursor-pointer hover:text-white transition">
+            SINYAL <span id="sort_signal" class="text-slate-600">↕</span>
+          </th>
+        </tr>
+      `;
+
+      updateSortIcons();
+
+      let filtered = [...rawScreenerData];
+
+      if (currentFilter === 'LQ45' || userRole === 'free') {
+        filtered = filtered.filter(item => item.isLQ45 === true);
+        dot.className = 'w-2.5 h-2.5 rounded-full bg-indigo-400';
+        title.innerText = 'RADAR LQ45';
+      } else if (currentFilter === 'KOMPAS100') {
+        filtered = filtered.filter(item => item.isKOMPAS100 === true);
+        dot.className = 'w-2.5 h-2.5 rounded-full bg-cyan-400';
+        title.innerText = 'RADAR KOMPAS 100';
+      } else if (currentFilter === 'STRONGBUY') {
+        filtered = filtered.filter(item => {
+          const sig = (item.signal || '').toUpperCase();
+          return sig.includes('STRONG BUY') || (parseFloat(item.vpa) >= 2.0 && parseFloat(item.fqs) >= 2.0 && item.up);
+        });
+        dot.className = 'w-2.5 h-2.5 rounded-full bg-amber-400 animate-pulse';
+        title.innerText = '⚡ STRONG BUY CANDIDATES';
+      } else {
+        filtered = filtered.filter(item => item.isALL === true || item.ticker);
+        dot.className = 'w-2.5 h-2.5 rounded-full bg-emerald-400';
+        title.innerText = 'RADAR ALL IHSG';
+      }
+
+      filtered.sort((a, b) => {
+        let valA, valB;
+        switch (sortColumn) {
+          case 'ticker':
+            return sortDirection === 'asc' ? a.ticker.localeCompare(b.ticker) : b.ticker.localeCompare(a.ticker);
+          case 'price':
+            valA = Number(a.price) || 0; valB = Number(b.price) || 0; break;
+          case 'chg':
+            valA = parseFloat(String(a.chg).replace('%', '').replace('+', '')) || 0;
+            valB = parseFloat(String(b.chg).replace('%', '').replace('+', '')) || 0; break;
+          case 'vpa':
+            valA = parseFloat(a.vpa) || 0; valB = parseFloat(b.vpa) || 0; break;
+          case 'freq':
+            valA = parseFloat(a.fqs) || 0; valB = parseFloat(b.fqs) || 0; break;
+          case 'signal':
+            const getSigWeight = (s) => {
+              const str = (s || '').toUpperCase();
+              if (str.includes('STRONG BUY')) return 3;
+              if (str.includes('BUY') || str.includes('ACCUMULATION')) return 2;
+              if (str.includes('WAIT')) return 1;
+              return 0;
+            };
+            valA = getSigWeight(a.signal); valB = getSigWeight(b.signal); break;
+          case 'score':
+          default:
+            valA = a.calcScore || 0; valB = b.calcScore || 0; break;
+        }
+        return sortDirection === 'asc' ? valA - valB : valB - valA;
+      });
+
+      countLabel.innerText = filtered.length;
+      tbody.innerHTML = '';
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" class="text-center py-8 text-slate-500">Tidak ada emiten dengan kriteria <b>${currentFilter}</b> saat ini.</td></tr>`;
+        return;
+      }
+
+      filtered.forEach(item => {
+        const tr = document.createElement('tr');
+        tr.className = 'hover:bg-[#161d28] cursor-pointer transition border-b border-slate-800/40';
+        tr.onclick = () => loadTickerDetails(item.ticker);
+
+        const chgColor = item.up ? 'text-emerald-400' : 'text-rose-400';
+        const isStrong = (item.signal || '').toUpperCase().includes('STRONG BUY');
+
+        tr.innerHTML = `
+          <td class="py-2.5 px-3 font-bold text-white flex items-center gap-1.5">
+            <span>${item.ticker}</span>
+            ${item.isLQ45 ? '<span class="text-[9px] px-1 bg-indigo-500/20 text-indigo-400 rounded">LQ</span>' : ''}
+            ${(!item.isLQ45 && item.isKOMPAS100) ? '<span class="text-[9px] px-1 bg-cyan-500/20 text-cyan-400 rounded">K100</span>' : ''}
+            ${(!item.isLQ45 && !item.isKOMPAS100) ? '<span class="text-[9px] px-1 bg-slate-500/20 text-slate-400 rounded">ALL</span>' : ''}
+            ${isStrong ? '<span class="text-[9px] px-1 bg-amber-500/20 text-amber-400 font-black rounded border border-amber-500/30">★</span>' : ''}
+          </td>
+          <td class="py-2.5 px-2 text-right text-slate-200">${item.price.toLocaleString('id-ID')}</td>
+          <td class="py-2.5 px-2 text-right font-bold ${chgColor}">${item.chg}</td>
+          <td class="py-2.5 px-2 text-right text-emerald-400 font-semibold">${item.vpa}</td>
+          <td class="py-2.5 px-2 text-right text-cyan-400">${item.fqs}</td>
+          <td class="py-2.5 px-3 text-[10px] font-bold ${isStrong ? 'text-amber-400' : 'text-slate-300'} truncate max-w-[130px]">${item.signal}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      if (!candleSeries.data().length && filtered[0]) {
+        loadTickerDetails(filtered[0].ticker);
+      }
+    }
+
+    function updateMetricBadges(data) {
+      const vpaVal = parseFloat(data.volRatio || data.vpa) || 0;
+      const vpaBadge = document.getElementById('cardVPA_Badge');
+      if (vpaVal >= 3.0) {
+        vpaBadge.innerText = 'MASSIVE ACCUM';
+        vpaBadge.className = 'text-[9px] px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-400 font-bold border border-emerald-500/40';
+      } else if (vpaVal >= 2.0) {
+        vpaBadge.innerText = 'STRONG';
+        vpaBadge.className = 'text-[9px] px-1.5 py-0.2 rounded bg-emerald-500/10 text-emerald-400 font-semibold';
+      } else if (vpaVal >= 1.0) {
+        vpaBadge.innerText = 'MODERATE';
+        vpaBadge.className = 'text-[9px] px-1.5 py-0.2 rounded bg-amber-500/10 text-amber-400';
+      } else {
+        vpaBadge.innerText = 'LOW VOL';
+        vpaBadge.className = 'text-[9px] px-1.5 py-0.2 rounded bg-slate-800 text-slate-400';
+      }
+
+      const fqsVal = parseFloat(data.freqRatio || data.fqs) || 0;
+      const fqsBadge = document.getElementById('cardFQS_Badge');
+      if (fqsVal >= 3.0) {
+        fqsBadge.innerText = 'AGGRESSIVE';
+        fqsBadge.className = 'text-[9px] px-1.5 py-0.2 rounded bg-cyan-500/20 text-cyan-300 font-bold border border-cyan-500/40';
+      } else if (fqsVal >= 2.0) {
+        fqsBadge.innerText = 'SPIKE';
+        fqsBadge.className = 'text-[9px] px-1.5 py-0.2 rounded bg-cyan-500/10 text-cyan-400 font-semibold';
+      } else {
+        fqsBadge.innerText = 'NORMAL';
+        fqsBadge.className = 'text-[9px] px-1.5 py-0.2 rounded bg-slate-800 text-slate-400';
+      }
+
+      const rsiVal = parseFloat(data.rsi) || 50;
+      const rsiBadge = document.getElementById('cardRSI_Badge');
+      if (rsiVal >= 70) {
+        rsiBadge.innerText = 'OVERBOUGHT';
+        rsiBadge.className = 'text-[9px] px-1.5 py-0.2 rounded bg-rose-500/20 text-rose-400 font-bold border border-rose-500/40';
+      } else if (rsiVal >= 55) {
+        rsiBadge.innerText = 'BULLISH';
+        rsiBadge.className = 'text-[9px] px-1.5 py-0.2 rounded bg-emerald-500/10 text-emerald-400 font-semibold';
+      } else if (rsiVal >= 45) {
+        rsiBadge.innerText = 'NEUTRAL';
+        rsiBadge.className = 'text-[9px] px-1.5 py-0.2 rounded bg-slate-800 text-slate-300';
+      } else if (rsiVal <= 30) {
+        rsiBadge.innerText = 'OVERSOLD';
+        rsiBadge.className = 'text-[9px] px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-400 font-bold border border-amber-500/40';
+      } else {
+        rsiBadge.innerText = 'BEARISH';
+        rsiBadge.className = 'text-[9px] px-1.5 py-0.2 rounded bg-rose-500/10 text-rose-300';
+      }
+
+      const deanVal = parseFloat(data.deanScore) || 0;
+      const deanBadge = document.getElementById('cardDean_Badge');
+      if (deanVal >= 0.001) {
+        deanBadge.innerText = 'STRONG MOM';
+        deanBadge.className = 'text-[9px] px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-400 font-bold border border-amber-500/40';
+      } else {
+        deanBadge.innerText = 'WEAK';
+        deanBadge.className = 'text-[9px] px-1.5 py-0.2 rounded bg-slate-800 text-slate-500';
+      }
+
+      const curPrice = Number(data.price) || 1;
+      const suppPrice = Number(data.support) || curPrice;
+      const suppDiff = (((curPrice - suppPrice) / suppPrice) * 100).toFixed(1);
+      const suppBadge = document.getElementById('cardSupport_Badge');
+      suppBadge.innerText = `+${suppDiff}% di atas`;
+      suppBadge.className = (suppDiff <= 5 && suppDiff >= 0) 
+        ? 'text-[9px] px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-400 font-bold' 
+        : 'text-[9px] px-1.5 py-0.2 rounded bg-slate-800 text-slate-400';
+
+      const resPrice = Number(data.resistance) || curPrice;
+      const resDiff = (((resPrice - curPrice) / curPrice) * 100).toFixed(1);
+      const resBadge = document.getElementById('cardResistance_Badge');
+      if (resDiff > 0) {
+        resBadge.innerText = `Upside +${resDiff}%`;
+        resBadge.className = 'text-[9px] px-1.5 py-0.2 rounded bg-emerald-500/10 text-emerald-400 font-semibold';
+      } else {
+        resBadge.innerText = 'Breakout/Peak';
+        resBadge.className = 'text-[9px] px-1.5 py-0.2 rounded bg-amber-500/10 text-amber-400';
+      }
+
+      const volLotBadge = document.getElementById('cardVolLot_Badge');
+      const volStr = String(data.volume || '').replace(/[^0-9]/g, '');
+      const volVal = parseInt(volStr) || 0;
+      if (volVal >= 100000) {
+        volLotBadge.innerText = 'HIGH LIQUID';
+        volLotBadge.className = 'text-[9px] px-1.5 py-0.2 rounded bg-emerald-500/10 text-emerald-400 font-semibold';
+      } else if (volVal >= 20000) {
+        volLotBadge.innerText = 'MODERATE';
+        volLotBadge.className = 'text-[9px] px-1.5 py-0.2 rounded bg-slate-800 text-slate-300';
+      } else {
+        volLotBadge.innerText = 'LOW';
+        volLotBadge.className = 'text-[9px] px-1.5 py-0.2 rounded bg-rose-500/10 text-rose-400';
+      }
+
+      const toBadge = document.getElementById('cardTurnover_Badge');
+      const toStr = String(data.turnover || '');
+      if (toStr.includes('B') || toStr.includes('T')) {
+        toBadge.innerText = 'BIG CAP';
+        toBadge.className = 'text-[9px] px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-400 font-bold border border-emerald-500/30';
+      } else if (toStr.includes('M') && parseFloat(toStr) >= 2.0) {
+        toBadge.innerText = 'ACTIVE';
+        toBadge.className = 'text-[9px] px-1.5 py-0.2 rounded bg-emerald-500/10 text-emerald-400';
+      } else {
+        toBadge.innerText = 'THIN';
+        toBadge.className = 'text-[9px] px-1.5 py-0.2 rounded bg-slate-800 text-slate-400';
+      }
+    }
+
+    async function loadTickerDetails(ticker) {
+      try {
+        const res = await fetch(`/api/cek?ticker=${ticker}`);
+        const data = await res.json();
+        if (data.status !== 'success') return;
+
+        document.getElementById('tickerSearchInput').value = data.ticker;
+        document.getElementById('cardTicker').innerText = data.ticker;
+        document.getElementById('cardPrice').innerText = `Rp ${data.price.toLocaleString('id-ID')}`;
+        
+        const chgElem = document.getElementById('cardChg');
+        chgElem.innerText = data.chg;
+        chgElem.className = data.chg.startsWith('+') 
+          ? 'text-xs sm:text-sm font-bold px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/30'
+          : 'text-xs sm:text-sm font-bold px-1.5 py-0.5 rounded bg-rose-500/10 text-rose-400 border border-rose-500/30';
+
+        const sigElem = document.getElementById('cardSignal');
+        sigElem.innerText = data.signal;
+        if (data.signal.toUpperCase().includes('STRONG BUY')) {
+          sigElem.className = 'text-xs font-bold px-2.5 py-1 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40 animate-pulse';
+        } else {
+          sigElem.className = 'text-xs font-bold px-2.5 py-1 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/30';
+        }
+
+        document.getElementById('cardVPA').innerText = data.vpa;
+        document.getElementById('cardFQS').innerText = data.fqs;
+        document.getElementById('cardRSI').innerText = data.rsi;
+        document.getElementById('cardDean').innerText = data.deanScore;
+        document.getElementById('cardSupport').innerText = `Rp ${data.support.toLocaleString('id-ID')}`;
+        document.getElementById('cardResistance').innerText = `Rp ${data.resistance.toLocaleString('id-ID')}`;
+        document.getElementById('cardVolLot').innerText = data.volume;
+        document.getElementById('cardTurnover').innerText = data.turnover;
+        document.getElementById('cardActionNote').innerText = `Catatan: ${data.actionNote} | MA20: Rp ${data.ma20} | MA50: Rp ${data.ma50}`;
+
+        updateMetricBadges(data);
+
+        // 1. Candlestick Data
+        const candleData = data.candles.map(c => ({
+          time: c.time,
+          open: c.open,
+          high: c.high,
+          low: c.low,
+          close: c.close
+        }));
+        candleSeries.setData(candleData);
+
+        // 2. Price Label Marker Tepat di Atas Candle Terakhir
+        if (candleData.length > 0) {
+          const lastCandle = candleData[candleData.length - 1];
+          const isCandleGreen = lastCandle.close >= lastCandle.open;
+          candleSeries.setMarkers([
+            {
+              time: lastCandle.time,
+              position: 'aboveBar',
+              color: isCandleGreen ? '#10b981' : '#f43f5e',
+              shape: 'arrowDown',
+              text: `Rp ${lastCandle.close.toLocaleString('id-ID')}`
+            }
+          ]);
+        }
+
+        // 3. Volume Data
+        const volData = data.candles.map(c => ({
+          time: c.time,
+          value: c.volume,
+          color: c.close >= c.open ? 'rgba(16, 185, 129, 0.4)' : 'rgba(244, 63, 94, 0.4)'
+        }));
+        volumeSeries.setData(volData);
+
+        // 4. Moving Averages Data
+        if (data.ma20Series) ma20Line.setData(data.ma20Series);
+        if (data.ma50Series) ma50Line.setData(data.ma50Series);
+        if (data.volMa20Series) volMa20Line.setData(data.volMa20Series);
+
+        // 5. RSI Historical Line Data
+        if (data.rsiSeries && data.rsiSeries.length > 0) {
+          rsiLine.setData(data.rsiSeries);
+        } else {
+          // Fallback sinkronisasi jika deret parsial
+          const rsiMap = new Map();
+          (data.rsiSeries || []).forEach(r => rsiMap.set(r.time, r.value));
+          let currentRsi = parseFloat(data.rsi) || 50;
+          const completeRsiData = [];
+
+          for (let i = 0; i < candleData.length; i++) {
+            const t = candleData[i].time;
+            if (rsiMap.has(t)) {
+              currentRsi = rsiMap.get(t);
+            }
+            completeRsiData.push({ time: t, value: currentRsi });
+          }
+          rsiLine.setData(completeRsiData);
+        }
+
+        syncPriceScaleWidths();
+
+        candleChart.timeScale().fitContent();
+        const baseRange = candleChart.timeScale().getVisibleLogicalRange();
+        if (baseRange) {
+          rsiChart.timeScale().setVisibleLogicalRange(baseRange);
+        }
+
+        setTimeout(syncPriceScaleWidths, 80);
+
+        if (window.innerWidth < 1024) {
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+      } catch (e) {
+        console.error('Error loadTickerDetails:', e);
+      }
+    }
+
+    function searchCustomTicker() {
+      const input = document.getElementById('tickerSearchInput');
+      const val = input.value.trim().toUpperCase();
+      if (val) loadTickerDetails(val);
+    }
+
+    function setFilter(filter) {
+      currentFilter = filter;
+      const bAll = document.getElementById('btnUnivAll');
+      const bLQ = document.getElementById('btnUnivLQ45');
+      const bK = document.getElementById('btnUnivKOMPAS');
+      const bSB = document.getElementById('btnStrongBuy');
+
+      bAll.className = 'px-2.5 py-1 rounded text-slate-400 hover:text-white flex items-center gap-1 transition';
+      bLQ.className = 'px-2.5 py-1 rounded text-slate-400 hover:text-white flex items-center gap-1 transition';
+      bK.className = 'px-2.5 py-1 rounded text-slate-400 hover:text-white flex items-center gap-1 transition';
+      bSB.className = 'px-2.5 py-1 rounded bg-amber-500/10 text-amber-400 border border-amber-500/40 hover:bg-amber-500/20 text-[11px] font-bold flex items-center gap-1 transition';
+
+      if (filter === 'ALL') {
+        bAll.className = 'px-2.5 py-1 rounded bg-emerald-600 text-white font-bold flex items-center gap-1 transition';
+      } else if (filter === 'LQ45') {
+        bLQ.className = 'px-2.5 py-1 rounded bg-emerald-600 text-white font-bold flex items-center gap-1 transition';
+      } else if (filter === 'KOMPAS100') {
+        bK.className = 'px-2.5 py-1 rounded bg-emerald-600 text-white font-bold flex items-center gap-1 transition';
+      } else if (filter === 'STRONGBUY') {
+        bSB.className = 'px-2.5 py-1 rounded bg-amber-500 text-black font-black border border-amber-400 shadow-md shadow-amber-500/30 text-[11px] flex items-center gap-1 transition';
+      }
+
+      sortColumn = 'score';
+      sortDirection = 'desc';
+
+      renderTable();
+    }
+
+    function triggerRescan() {
+      if (userRole === 'free' && scanQuotaRemaining <= 0) {
+        openUpgradeModal('Batas Kuota Rescan Habis');
+        return;
+      }
+
+      const icon = document.getElementById('refreshIcon');
+      icon.classList.add('animate-spin');
+      fetchScreenerData(true).finally(() => {
+        setTimeout(() => icon.classList.remove('animate-spin'), 1500);
+      });
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      initCharts();
+      loadCurrentUser().then(() => {
+        fetchScreenerData(false);
+      });
+    });
+  </script>
+</body>
+</html>

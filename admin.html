@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Owner Panel - IDX Confluence Pro</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'JetBrains Mono', monospace; }
+    ::-webkit-scrollbar { width: 4px; height: 4px; }
+    ::-webkit-scrollbar-track { background: #080a0f; }
+    ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 2px; }
+  </style>
+</head>
+<body class="bg-[#080a0f] text-slate-200 min-h-screen flex flex-col selection:bg-amber-500 selection:text-black">
+
+  <!-- TOP BAR -->
+  <header class="border-b border-slate-800 bg-[#0c1017] px-4 sm:px-8 py-3 sticky top-0 z-50">
+    <div class="max-w-[1600px] mx-auto flex items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <div class="w-3 h-3 rounded-full bg-amber-400 animate-pulse ring-4 ring-amber-500/20"></div>
+        <span class="text-sm sm:text-base font-bold tracking-wider text-white">OWNER CONTROL CENTER</span>
+        <span class="text-[10px] px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40 font-bold">ADMIN ROOT</span>
+      </div>
+
+      <div class="flex items-center gap-2 sm:gap-3">
+        <!-- TOMBOL PINTASAN DOKUMEN OWNER -->
+        <a href="/docs-admin" target="_blank" class="text-xs px-3 py-1.5 rounded bg-emerald-600 hover:bg-emerald-500 text-white font-bold transition flex items-center gap-1 shadow-lg shadow-emerald-950">
+          <span> DOCS OWNER</span>
+        </a>
+
+        <a href="/" class="text-xs px-3 py-1.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700 font-semibold transition flex items-center gap-1">
+          <span>← Terminal Screener</span>
+        </a>
+
+        <button onclick="resetGlobalSessions()" class="text-xs px-3 py-1.5 rounded bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 font-semibold transition">
+          Reset Rate Limiter
+        </button>
+
+        <a href="/logout" class="text-xs px-3 py-1.5 rounded bg-rose-600 hover:bg-rose-500 text-white font-bold transition">
+          Logout
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- CONTENT -->
+  <main class="max-w-[1600px] w-full mx-auto p-4 sm:p-6 lg:p-8 flex-1 flex flex-col gap-6">
+
+    <!-- STATS COUNTER -->
+    <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">
+      <div class="bg-[#0f141d] border border-slate-800 p-4 rounded-xl flex flex-col justify-between">
+        <span class="text-xs text-slate-400 font-semibold">TOTAL USER TERDAFTAR</span>
+        <span id="statTotalUsers" class="text-2xl font-black text-white mt-2">-</span>
+      </div>
+      <div class="bg-[#0f141d] border border-slate-800 p-4 rounded-xl flex flex-col justify-between">
+        <span class="text-xs text-slate-400 font-semibold">PRO MEMBER AKTIF</span>
+        <span id="statProUsers" class="text-2xl font-black text-emerald-400 mt-2">-</span>
+      </div>
+      <div class="bg-[#0f141d] border border-slate-800 p-4 rounded-xl flex flex-col justify-between">
+        <span class="text-xs text-slate-400 font-semibold">FREE TIER USER</span>
+        <span id="statFreeUsers" class="text-2xl font-black text-slate-300 mt-2">-</span>
+      </div>
+      <div class="bg-[#0f141d] border border-slate-800 p-4 rounded-xl flex flex-col justify-between">
+        <span class="text-xs text-slate-400 font-semibold">OWNER ACCOUNT</span>
+        <span id="statOwnerUsers" class="text-2xl font-black text-amber-300 mt-2">-</span>
+      </div>
+    </div>
+
+    <!-- FORM TAMBAH USER MANUAL -->
+    <div class="bg-[#0f141d] border border-slate-800 rounded-xl p-4 sm:p-5">
+      <div class="text-xs font-bold text-slate-300 uppercase tracking-wider mb-3 flex items-center gap-2">
+        <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+        <span>Tambah Pengguna Baru Manual</span>
+      </div>
+      <form onsubmit="addUserManual(event)" class="grid grid-cols-1 sm:grid-cols-5 gap-3 text-xs">
+        <input id="inputName" type="text" placeholder="Nama Pengguna" required
+               class="bg-[#141a24] border border-slate-700/80 rounded px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500" />
+        <input id="inputEmail" type="email" placeholder="Alamat Email" required
+               class="bg-[#141a24] border border-slate-700/80 rounded px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500" />
+        <input id="inputPassword" type="password" placeholder="Password (min 6 char)" required minlength="6"
+               class="bg-[#141a24] border border-slate-700/80 rounded px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500" />
+        <select id="inputRole" class="bg-[#141a24] border border-slate-700/80 rounded px-3 py-2 text-white focus:outline-none focus:border-emerald-500">
+          <option value="free">FREE TIER (3x Quota)</option>
+          <option value="pro" selected>PRO MEMBER (30 Hari)</option>
+          <option value="owner">OWNER (Full Root)</option>
+        </select>
+        <button type="submit" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded py-2 transition flex items-center justify-center gap-1 shadow-lg shadow-emerald-950">
+          <span>+ Tambah Akun</span>
+        </button>
+      </form>
+    </div>
+
+    <!-- TABEL KELOLA USER -->
+    <div class="bg-[#0f141d] border border-slate-800 rounded-xl flex flex-col flex-1 overflow-hidden">
+      <div class="p-4 border-b border-slate-800 flex items-center justify-between gap-4">
+        <div class="text-xs font-bold text-white tracking-wider uppercase flex items-center gap-2">
+          <span>Daftar Seluruh Pengguna Sistem</span>
+        </div>
+        <button onclick="loadUsersTable()" class="text-xs px-3 py-1 rounded bg-[#141a24] hover:bg-slate-800 text-emerald-400 border border-slate-700 font-bold transition">
+          ↻ Refresh Tabel
+        </button>
+      </div>
+
+      <div class="overflow-x-auto flex-1">
+        <table class="w-full text-left border-collapse text-xs whitespace-nowrap">
+          <thead class="bg-[#141a24] text-slate-400 uppercase tracking-wider text-[10px] sticky top-0">
+            <tr>
+              <th class="py-3 px-4">Nama</th>
+              <th class="py-3 px-3">Email</th>
+              <th class="py-3 px-3">Role</th>
+              <th class="py-3 px-3">Sisa Kuota</th>
+              <th class="py-3 px-3">Masa Aktif PRO</th>
+              <th class="py-3 px-4 text-center">Tindakan Admin</th>
+            </tr>
+          </thead>
+          <tbody id="usersTableBody" class="divide-y divide-slate-800/60 font-medium text-slate-300">
+            <tr>
+              <td colspan="6" class="text-center py-8 text-slate-500">Memuat data pengguna...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
+
+  <footer class="text-center py-3 text-[10px] text-slate-500 border-t border-slate-800 bg-[#0c1017]">
+    IDX Confluence Pro Terminal • Owner Management Control Center
+  </footer>
+
+  <!-- SCRIPT ADMIN ENGINE -->
+  <script>
+    let allUsersData = [];
+
+    function formatTimeRemaining(expireMs) {
+      if (!expireMs) return '-';
+      const diff = Number(expireMs) - Date.now();
+      if (diff <= 0) return '<span class="text-rose-400">Expired</span>';
+      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      if (days > 0) return `${days} Hari ${hours} Jam`;
+      return `${hours} Jam Lagi`;
+    }
+
+    async function loadUsersTable() {
+      const tbody = document.getElementById('usersTableBody');
+      try {
+        const res = await fetch('/api/admin/users');
+        const data = await res.json();
+        if (data.status !== 'success') {
+          tbody.innerHTML = '<tr><td colspan="6" class="text-center py-8 text-rose-500">Gagal mengambil data user.</td></tr>';
+          return;
+        }
+
+        allUsersData = data.users || data.data || [];
+        updateCounters(allUsersData);
+        renderTable(allUsersData);
+      } catch (err) {
+        tbody.innerHTML = '<tr><td colspan="6" class="text-center py-8 text-rose-500">Koneksi terputus ke server.</td></tr>';
+      }
+    }
+
+    function updateCounters(users) {
+      document.getElementById('statTotalUsers').innerText = users.length;
+      document.getElementById('statProUsers').innerText = users.filter(u => u.role === 'pro').length;
+      document.getElementById('statFreeUsers').innerText = users.filter(u => u.role === 'free').length;
+      document.getElementById('statOwnerUsers').innerText = users.filter(u => u.role === 'owner').length;
+    }
+
+    function renderTable(users) {
+      const tbody = document.getElementById('usersTableBody');
+      tbody.innerHTML = '';
+
+      if (users.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" class="text-center py-8 text-slate-500">Belum ada akun di database.</td></tr>';
+        return;
+      }
+
+      users.forEach(u => {
+        const tr = document.createElement('tr');
+        tr.className = 'hover:bg-[#161e2b] transition border-b border-slate-800/40';
+
+        let roleBadge = '<span class="text-[10px] px-2 py-0.5 rounded bg-slate-800 text-slate-400 font-bold">FREE</span>';
+        if (u.role === 'pro') {
+          roleBadge = '<span class="text-[10px] px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 font-bold">PRO</span>';
+        } else if (u.role === 'owner') {
+          roleBadge = '<span class="text-[10px] px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40 font-bold">OWNER</span>';
+        }
+
+        const isOwnerAccount = u.role === 'owner';
+
+        tr.innerHTML = `
+          <td class="py-3 px-4 font-bold text-white">${u.name || 'User'}</td>
+          <td class="py-3 px-3 text-slate-300 font-mono text-[11px]">${u.email}</td>
+          <td class="py-3 px-3">${roleBadge}</td>
+          <td class="py-3 px-3 font-mono">${u.role === 'owner' ? '∞' : (u.scanQuotaRemaining ?? 3)}</td>
+          <td class="py-3 px-3 font-mono text-[11px]">${formatTimeRemaining(u.proExpiresAt)}</td>
+          <td class="py-3 px-4 text-center">
+            <div class="inline-flex items-center gap-1.5">
+              ${!isOwnerAccount ? `
+                <button onclick="changeRole('${u.email}', 'pro', 30)" class="text-[10px] px-2 py-1 rounded bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 font-bold transition">
+                  +30H PRO
+                </button>
+                <button onclick="changeRole('${u.email}', 'free')" class="text-[10px] px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-400 font-bold transition">
+                  Set FREE
+                </button>
+                <button onclick="deleteUser('${u.email}')" class="text-[10px] px-2 py-1 rounded bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 font-bold transition">
+                  Hapus
+                </button>
+              ` : `
+                <span class="text-[10px] text-amber-500/60 italic font-mono">Protected Root</span>
+              `}
+            </div>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    async function changeRole(email, newRole, addDays = null) {
+      try {
+        const res = await fetch('/api/admin/users/update-role', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, role: newRole, addDays })
+        });
+        const data = await res.json();
+        if (data.status === 'success') {
+          loadUsersTable();
+        } else {
+          alert('Gagal ubah role: ' + (data.message || 'Error'));
+        }
+      } catch (e) {
+        alert('Gagal menghubungi server.');
+      }
+    }
+
+    async function deleteUser(email) {
+      if (!confirm(`Yakin ingin menghapus akun ${email}? Tindakan ini tidak dapat dibatalkan.`)) return;
+      try {
+        const res = await fetch('/api/admin/users/delete', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email })
+        });
+        const data = await res.json();
+        if (data.status === 'success') {
+          loadUsersTable();
+        } else {
+          alert('Gagal menghapus user: ' + (data.message || 'Error'));
+        }
+      } catch (e) {
+        alert('Gagal menghubungi server.');
+      }
+    }
+
+    async function addUserManual(e) {
+      e.preventDefault();
+      const name = document.getElementById('inputName').value.trim();
+      const email = document.getElementById('inputEmail').value.trim();
+      const password = document.getElementById('inputPassword').value.trim();
+      const role = document.getElementById('inputRole').value;
+
+      try {
+        const res = await fetch('/api/admin/users', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, email, password, role, daysActive: role === 'pro' ? 30 : null })
+        });
+        const data = await res.json();
+        if (data.status === 'success') {
+          alert('User baru berhasil ditambahkan!');
+          document.getElementById('inputName').value = '';
+          document.getElementById('inputEmail').value = '';
+          document.getElementById('inputPassword').value = '';
+          loadUsersTable();
+        } else {
+          alert('Gagal menambah user: ' + (data.message || 'Error'));
+        }
+      } catch (err) {
+        alert('Gagal menghubungi server.');
+      }
+    }
+
+    async function resetGlobalSessions() {
+      if (!confirm('Hapus seluruh riwayat lockout IP dan penalti rate limiter?')) return;
+      try {
+        const res = await fetch('/api/admin/force-logout-all', { method: 'POST' });
+        const data = await res.json();
+        alert(data.message || 'Selesai di-reset.');
+      } catch (e) {
+        alert('Gagal menghubungi server.');
+      }
+    }
+
+    window.addEventListener('DOMContentLoaded', loadUsersTable);
+  </script>
+</body>
+</html>

@@ -1,0 +1,33 @@
+# Dependencies
+node_modules/
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Logs
+*.log
+npm-debug.log*
+activity_log.txt
+
+# Runtime data
+screener_cache.json
+users.json
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Media
+*.mp4
+*.mov
+
+# Docker
+docker-compose.override.yml

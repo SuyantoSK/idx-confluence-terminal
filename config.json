@@ -1,0 +1,18 @@
+{
+  "telegram": {
+    "bot_token": "8650532827:AAEwHeDZNeJApSfLRm4oouSoRJnSQ1c_hZA",
+    "admin_id": "",
+    "targets": [
+      {
+        "chat_id": "@analisajkse",
+        "message_thread_id": 299528
+      }
+    ]
+  },
+  "screener": {
+    "k_factor": 1.5,
+    "min_avg_volume": 500000,
+    "batch_size": 10,
+    "batch_delay_ms": 500
+  }
+}
